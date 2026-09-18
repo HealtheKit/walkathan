@@ -1,71 +1,23 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
-import '../../../config/router/route_names.dart';
 import '../../../constants/firebase_constants.dart';
 import '../../../models/custom_error.dart';
 import '../../../repositories/auth_repository_provider.dart';
 import '../../../utils/error_dialog.dart';
 
-class VerifyEmailPage extends ConsumerStatefulWidget {
+// With Supabase, email verification is handled via confirmation links.
+// If "Enable email confirmations" is on in the Supabase dashboard,
+// users cannot sign in until they click the confirmation link.
+// This page is kept as a fallback informational screen.
+
+class VerifyEmailPage extends ConsumerWidget {
   const VerifyEmailPage({super.key});
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() =>
-      _VerifyEmailPageState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final email = supabaseClient.auth.currentUser?.email ?? '';
 
-class _VerifyEmailPageState extends ConsumerState<VerifyEmailPage> {
-  Timer? timer;
-
-  @override
-  void initState() {
-    super.initState();
-    sendEmailVerification();
-    timer = Timer.periodic(const Duration(seconds: 5), (timer) {
-      checkEmailVerified();
-    });
-  }
-
-  @override
-  void dispose() {
-    timer?.cancel();
-    super.dispose();
-  }
-
-  Future<void> sendEmailVerification() async {
-    try {
-      await ref.read(authRepositoryProvider).sendEmailVerification();
-    } on CustomError catch (e) {
-      if (!mounted) return;
-      errorDialog(context, e);
-    }
-  }
-
-  Future<void> checkEmailVerified() async {
-    final goRouter = GoRouter.of(context);
-
-    void errorDialogRef(CustomError e) {
-      errorDialog(context, e);
-    }
-
-    try {
-      await ref.read(authRepositoryProvider).reloadUser();
-
-      if (fbAuth.currentUser!.emailVerified == true) {
-        timer?.cancel();
-        goRouter.goNamed(RouteNames.home);
-      }
-    } on CustomError catch (e) {
-      errorDialogRef(e);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Email Verification'),
@@ -78,9 +30,12 @@ class _VerifyEmailPageState extends ConsumerState<VerifyEmailPage> {
               padding: const EdgeInsets.all(20),
               child: Column(
                 children: [
-                  const Text('Verification email has been sent to'),
-                  Text('${fbAuth.currentUser?.email}'),
-                  const Text('If you cannot find verification email,'),
+                  const Text('A verification email has been sent to'),
+                  Text(email),
+                  const SizedBox(height: 10),
+                  const Text('Please click the link in the email to verify.'),
+                  const SizedBox(height: 10),
+                  const Text('If you cannot find the verification email,'),
                   RichText(
                     text: TextSpan(
                       text: 'Please check ',
@@ -100,7 +55,6 @@ class _VerifyEmailPageState extends ConsumerState<VerifyEmailPage> {
                       ],
                     ),
                   ),
-                  const Text('or, your email is correct.'),
                 ],
               ),
             ),
@@ -108,9 +62,8 @@ class _VerifyEmailPageState extends ConsumerState<VerifyEmailPage> {
               onPressed: () async {
                 try {
                   await ref.read(authRepositoryProvider).signout();
-                  timer?.cancel();
                 } on CustomError catch (e) {
-                  if (!mounted) return;
+                  if (!context.mounted) return;
                   errorDialog(context, e);
                 }
               },

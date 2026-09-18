@@ -1,10 +1,11 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../constants/firebase_constants.dart';
+import '../models/custom_error.dart';
 import 'handle_exception.dart';
 
 class AuthRepository {
-  User? get currentUser => fbAuth.currentUser;
+  User? get currentUser => supabaseClient.auth.currentUser;
 
   Future<void> signup({
     required String name,
@@ -13,18 +14,23 @@ class AuthRepository {
     required String gender,
   }) async {
     try {
-      final userCredential = await fbAuth.createUserWithEmailAndPassword(
+      final response = await supabaseClient.auth.signUp(
         email: email,
         password: password,
+        data: {
+          'name': name,
+          'gender': gender,
+        },
       );
 
-      final signedInUser = userCredential.user!;
-
-      await usersCollection.doc(signedInUser.uid).set({
-        'name': name,
-        'email': email,
-        'gender': gender,
-      });
+      final user = response.user;
+      if (user == null) {
+        throw const CustomError(
+          code: 'signup-failed',
+          message: 'Signup failed. Please try again.',
+          plugin: 'supabase_auth',
+        );
+      }
     } catch (e) {
       throw handleException(e);
     }
@@ -35,7 +41,7 @@ class AuthRepository {
     required String password,
   }) async {
     try {
-      await fbAuth.signInWithEmailAndPassword(
+      await supabaseClient.auth.signInWithPassword(
         email: email,
         password: password,
       );
@@ -46,7 +52,7 @@ class AuthRepository {
 
   Future<void> signout() async {
     try {
-      await fbAuth.signOut();
+      await supabaseClient.auth.signOut();
     } catch (e) {
       throw handleException(e);
     }
@@ -54,7 +60,9 @@ class AuthRepository {
 
   Future<void> changePassword(String password) async {
     try {
-      await currentUser!.updatePassword(password);
+      await supabaseClient.auth.updateUser(
+        UserAttributes(password: password),
+      );
     } catch (e) {
       throw handleException(e);
     }
@@ -62,23 +70,24 @@ class AuthRepository {
 
   Future<void> sendPasswordResetEmail(String email) async {
     try {
-      await fbAuth.sendPasswordResetEmail(email: email);
+      await supabaseClient.auth.resetPasswordForEmail(email);
     } catch (e) {
       throw handleException(e);
     }
   }
 
+  // Supabase handles email verification via confirmation links automatically.
+  // This is a no-op but kept for API compatibility.
   Future<void> sendEmailVerification() async {
-    try {
-      await currentUser!.sendEmailVerification();
-    } catch (e) {
-      throw handleException(e);
-    }
+    // Supabase sends confirmation email on signup automatically
+    // if "Enable email confirmations" is turned on in the dashboard.
   }
 
   Future<void> reloadUser() async {
+    // Supabase doesn't require explicit reload; session refreshes automatically.
+    // We can force a session refresh if needed:
     try {
-      await currentUser!.reload();
+      await supabaseClient.auth.refreshSession();
     } catch (e) {
       throw handleException(e);
     }
@@ -89,8 +98,9 @@ class AuthRepository {
     String password,
   ) async {
     try {
-      await currentUser!.reauthenticateWithCredential(
-        EmailAuthProvider.credential(email: email, password: password),
+      await supabaseClient.auth.signInWithPassword(
+        email: email,
+        password: password,
       );
     } catch (e) {
       throw handleException(e);

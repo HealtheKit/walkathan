@@ -1,24 +1,25 @@
-import 'package:flutter/foundation.dart';
-import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+class AppUser {
+  final String id;
+  final String name;
+  final String email;
 
-part 'app_user.freezed.dart';
+  const AppUser({
+    this.id = '',
+    this.name = '',
+    this.email = '',
+  });
 
-@freezed
-class AppUser with _$AppUser {
-  const factory AppUser({
-    @Default('') String id,
-    @Default('') String name,
-    @Default('') String email
-  }) = _AppUser;
-
-  factory AppUser.fromDoc(DocumentSnapshot appUserDoc) {
-    final appUserData = appUserDoc.data() as Map<String, dynamic>;
-
+  factory AppUser.fromMap(Map<String, dynamic> map) {
     return AppUser(
-      id: appUserDoc.id,
-      name: appUserData['name'],
-      email: appUserData['email'],
+      id: map['id'] ?? '',
+      name: map['name'] ?? '',
+      email: map['email'] ?? '',
     );
   }
+
+  Map<String, dynamic> toMap() => {
+        'id': id,
+        'name': name,
+        'email': email,
+      };
 }

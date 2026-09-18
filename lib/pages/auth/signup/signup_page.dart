@@ -69,7 +69,6 @@ class _SignupPageState extends ConsumerState<SignupPage> {
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
-        backgroundColor: Colors.white,
         body: Center(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 30.0),
@@ -80,7 +79,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                 shrinkWrap: true,
                 reverse: true,
                 children: [
-                  const FlutterLogo(size: 150),
+                  Image.asset('assets/images/logo.png', width: 200, height: 200,),
                   const SizedBox(height: 20.0),
                   NameFormField(nameController: _nameController),
                   const SizedBox(height: 20.0),

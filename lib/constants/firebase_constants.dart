@@ -1,7 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-final usersCollection = FirebaseFirestore.instance.collection('users');
-final walkStepsCollection = FirebaseFirestore.instance.collection('walk_steps');
-
-final fbAuth = FirebaseAuth.instance;
+SupabaseClient get supabaseClient => Supabase.instance.client;

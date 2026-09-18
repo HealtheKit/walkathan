@@ -77,7 +77,7 @@ class _ResetPasswordPageState extends ConsumerState<ResetPasswordPage> {
                 shrinkWrap: true,
                 reverse: true,
                 children: [
-                  const FlutterLogo(size: 150),
+                  Image.asset('assets/images/logo.png', width: 200, height: 200,),
                   const SizedBox(height: 20.0),
                   EmailFormField(emailController: _emailController),
                   const SizedBox(height: 20.0),

@@ -1,21 +1,10 @@
-import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../repositories/auth_repository_provider.dart';
 
-part 'signup_provider.g.dart';
-
-@riverpod
-class Signup extends _$Signup {
-  Object? _key;
-
+class SignupNotifier extends Notifier<AsyncValue<void>> {
   @override
-  FutureOr<void> build() {
-    _key = Object();
-    ref.onDispose(() {
-      print('[signupProvider] disposed');
-      _key = null;
-    });
-  }
+  AsyncValue<void> build() => const AsyncData<void>(null);
 
   Future<void> signup({
     required String name,
@@ -24,16 +13,14 @@ class Signup extends _$Signup {
     required String gender,
   }) async {
     state = const AsyncLoading<void>();
-    final key = _key;
 
-    final newState = await AsyncValue.guard<void>(
+    state = await AsyncValue.guard<void>(
       () => ref
           .read(authRepositoryProvider)
           .signup(name: name, email: email, password: password, gender: gender),
     );
-
-    if (key == _key) {
-      state = newState;
-    }
   }
 }
+
+final signupProvider =
+    NotifierProvider<SignupNotifier, AsyncValue<void>>(SignupNotifier.new);

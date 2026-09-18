@@ -1,12 +1,9 @@
-import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../repositories/auth_repository_provider.dart';
 
-part 'reset_password_provider.g.dart';
-
-@riverpod
-class ResetPassword extends _$ResetPassword {
+class ResetPasswordNotifier extends Notifier<AsyncValue<void>> {
   @override
-  FutureOr<void> build() {}
+  AsyncValue<void> build() => const AsyncData<void>(null);
 
   Future<void> resetPassword({required String email}) async {
     state = const AsyncLoading<void>();
@@ -16,3 +13,7 @@ class ResetPassword extends _$ResetPassword {
     );
   }
 }
+
+final resetPasswordProvider =
+    NotifierProvider<ResetPasswordNotifier, AsyncValue<void>>(
+        ResetPasswordNotifier.new);

@@ -65,81 +65,82 @@ class _SigninPageState extends ConsumerState<SigninPage> {
       child: Scaffold(
         body: Center(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 30),
-            child: Form(
-              key: _formKey,
-              autovalidateMode: _autovalidateMode,
-              child: ListView(
-                shrinkWrap: true,
-                reverse: true,
-                children: [
-                  Center(
-                    child: Text(
-                      'TEF Walkathan',
-                      style: TextStyle(
-                        fontSize: 40,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.blue,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20.0),
-                  EmailFormField(emailController: _emailController),
-                  const SizedBox(height: 20.0),
-                  PasswordFormField(
-                    passwordController: _passwordController,
-                    labelText: 'Password',
-                  ),
-                  const SizedBox(height: 20.0),
-                  CustomFilledButton(
-                    onPressed: signinState.maybeWhen(
-                      loading: () => null,
-                      orElse: () => _submit,
-                    ),
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.w600,
-                    child: Text(
-                      signinState.maybeWhen(
-                        loading: () => 'Submitting...',
-                        orElse: () => 'Sign In',
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20.0),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              
+                child: Form(
+                  key: _formKey,
+                  autovalidateMode: _autovalidateMode,
+                  child: ListView(
+                    shrinkWrap: true,
+                    reverse: true,
                     children: [
-                      const Text('Not a member? '),
+                      Image.asset('assets/images/logo.png', width: 200, height: 200,),
+                      Center(
+                        child: 
+                          Text(
+                          'TEF Walkathon',
+                          style: TextStyle(
+                            fontSize: 40,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20.0),
+                      EmailFormField(emailController: _emailController),
+                      const SizedBox(height: 20.0),
+                      PasswordFormField(
+                        passwordController: _passwordController,
+                        labelText: 'Password',
+                      ),
+                      const SizedBox(height: 20.0),
+                      CustomFilledButton(
+                        onPressed: signinState.maybeWhen(
+                          loading: () => null,
+                          orElse: () => _submit,
+                        ),
+                        fontSize: 20.0,
+                        fontWeight: FontWeight.w600,
+                        child: Text(
+                          signinState.maybeWhen(
+                            loading: () => 'Submitting...',
+                            orElse: () => 'Sign In',
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20.0),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text('Not a member? '),
+                          CustomTextButton(
+                            onPressed: signinState.maybeWhen(
+                              loading: () => null,
+                              orElse: () =>
+                                  () => context.goNamed(RouteNames.signup),
+                            ),
+                            fontSize: 18.0,
+                            fontWeight: FontWeight.bold,
+                            child: const Text('Sign Up!'),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
                       CustomTextButton(
                         onPressed: signinState.maybeWhen(
                           loading: () => null,
                           orElse: () =>
-                              () => context.goNamed(RouteNames.signup),
+                              () => context.goNamed(RouteNames.resetPassword),
                         ),
-                        fontSize: 18.0,
+                        fontSize: 16.0,
                         fontWeight: FontWeight.bold,
-                        child: const Text('Sign Up!'),
-                      ),
-                    ],
+                        child: const Text('Forgot Password?'),
+                      )
+                    ].reversed.toList(),
                   ),
-                  const SizedBox(height: 10),
-                  CustomTextButton(
-                    onPressed: signinState.maybeWhen(
-                      loading: () => null,
-                      orElse: () =>
-                          () => context.goNamed(RouteNames.resetPassword),
-                    ),
-                    foregroundColor: Colors.red,
-                    fontSize: 16.0,
-                    fontWeight: FontWeight.bold,
-                    child: const Text('Forgot Password?'),
-                  )
-                ].reversed.toList(),
+                ),
               ),
             ),
-          ),
         ),
-      ),
     );
   }
 }

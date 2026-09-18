@@ -1,4 +1,4 @@
-package com.example.walkathan
+package com.tresundios.walkathan
 
 import io.flutter.embedding.android.FlutterActivity
 

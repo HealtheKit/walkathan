@@ -1,17 +1,13 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../constants/firebase_constants.dart';
 import 'auth_repository.dart';
 
-part 'auth_repository_provider.g.dart';
-
-@riverpod
-AuthRepository authRepository(AuthRepositoryRef ref) {
+final authRepositoryProvider = Provider<AuthRepository>((ref) {
   return AuthRepository();
-}
+});
 
-@riverpod
-Stream<User?> authStateStream(AuthStateStreamRef ref) {
-  return fbAuth.authStateChanges();
-}
+final authStateStreamProvider = StreamProvider<AuthState>((ref) {
+  return supabaseClient.auth.onAuthStateChange;
+});

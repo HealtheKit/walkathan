@@ -1,13 +1,14 @@
-import 'package:flutter/foundation.dart';
-import 'package:freezed_annotation/freezed_annotation.dart';
+class CustomError implements Exception {
+  final String code;
+  final String message;
+  final String plugin;
 
-part 'custom_error.freezed.dart';
+  const CustomError({
+    this.code = '',
+    this.message = '',
+    this.plugin = '',
+  });
 
-@freezed
-class CustomError with _$CustomError {
-  const factory CustomError({
-    @Default('') String code,
-    @Default('') String message,
-    @Default('') String plugin,
-  }) = _CustomError;
+  @override
+  String toString() => 'CustomError(code: $code, message: $message, plugin: $plugin)';
 }

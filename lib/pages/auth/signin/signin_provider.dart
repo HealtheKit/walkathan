@@ -1,12 +1,9 @@
-import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../repositories/auth_repository_provider.dart';
 
-part 'signin_provider.g.dart';
-
-@riverpod
-class Signin extends _$Signin {
+class SigninNotifier extends Notifier<AsyncValue<void>> {
   @override
-  FutureOr<void> build() {}
+  AsyncValue<void> build() => const AsyncData<void>(null);
 
   Future<void> signin({
     required String email,
@@ -21,3 +18,6 @@ class Signin extends _$Signin {
     );
   }
 }
+
+final signinProvider =
+    NotifierProvider<SigninNotifier, AsyncValue<void>>(SigninNotifier.new);

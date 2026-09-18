@@ -11,8 +11,8 @@ void errorDialog(BuildContext context, CustomError e) {
       context: context,
       builder: (context) {
         return CupertinoAlertDialog(
-          title: Text(e.code),
-          content: Text('plugin: ${e.plugin}\n\n${e.message}'),
+          title: const Text('Error'),
+          content: Text(e.message),
           actions: [
             CupertinoDialogAction(
               child: const Text('OK'),
@@ -27,8 +27,8 @@ void errorDialog(BuildContext context, CustomError e) {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text(e.code),
-          content: Text('plugin: ${e.plugin}\n\n${e.message}'),
+          title: const Text('Error'),
+          content: Text(e.message),
           actions: [
             TextButton(
               child: const Text('OK'),

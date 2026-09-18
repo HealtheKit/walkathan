@@ -80,7 +80,7 @@ class _ReauthenticatePageState extends ConsumerState<ReauthenticatePage> {
               reverse: true,
               children: [
                 const Text(
-                  'This is a security-sesitive operation\nyou must have recently signed-in!',
+                  'This is a security-sensitive operation\nyou must have recently signed-in!',
                   style: TextStyle(
                     color: Colors.red,
                     fontWeight: FontWeight.bold,

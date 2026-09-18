@@ -1,12 +1,9 @@
-import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../repositories/auth_repository_provider.dart';
 
-part 'change_password_provider.g.dart';
-
-@riverpod
-class ChangePassword extends _$ChangePassword {
+class ChangePasswordNotifier extends Notifier<AsyncValue<void>> {
   @override
-  FutureOr<void> build() {}
+  AsyncValue<void> build() => const AsyncData<void>(null);
 
   Future<void> changePassword(String password) async {
     state = const AsyncLoading<void>();
@@ -16,3 +13,7 @@ class ChangePassword extends _$ChangePassword {
     );
   }
 }
+
+final changePasswordProvider =
+    NotifierProvider<ChangePasswordNotifier, AsyncValue<void>>(
+        ChangePasswordNotifier.new);
