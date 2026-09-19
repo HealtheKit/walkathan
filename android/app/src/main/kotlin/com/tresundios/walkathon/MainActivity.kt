@@ -1,4 +1,4 @@
-package com.tresundios.walkathan
+package com.tresundios.walkathon
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -1,9 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 Future<void> requestActivityRecognitionPermission() async {
   // Check if permission is already granted
   if (await Permission.activityRecognition.isGranted) {
-    print('Activity recognition permission granted');
+    debugPrint('Activity recognition permission granted');
     return;
   }
 
@@ -12,11 +13,11 @@ Future<void> requestActivityRecognitionPermission() async {
 
   // Handle the status
   if (status.isGranted) {
-    print('Permission granted');
+    debugPrint('Permission granted');
   } else if (status.isDenied) {
-    print('Permission denied');
+    debugPrint('Permission denied');
   } else if (status.isPermanentlyDenied) {
-    print('Permission permanently denied. Open app settings to enable it.');
+    debugPrint('Permission permanently denied. Open app settings to enable it.');
     await openAppSettings(); // Directs the user to app settings
   }
 }

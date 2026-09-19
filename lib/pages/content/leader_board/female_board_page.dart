@@ -12,7 +12,7 @@ class FeMaleBoardPage extends ConsumerStatefulWidget {
   const FeMaleBoardPage({super.key});
 
   @override
-  _FeMaleBoardPageState createState() => _FeMaleBoardPageState();
+  ConsumerState<FeMaleBoardPage> createState() => _FeMaleBoardPageState();
 }
 
 class _FeMaleBoardPageState extends ConsumerState<FeMaleBoardPage> {

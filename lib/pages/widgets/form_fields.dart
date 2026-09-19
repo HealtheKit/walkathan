@@ -144,7 +144,7 @@ class GenderFormField extends StatelessWidget {
       valueListenable: genderController,
       builder: (context, selectedGender, _) {
         return DropdownButtonFormField<String>(
-          value: selectedGender,
+          initialValue: selectedGender,
           decoration: const InputDecoration(
             border: OutlineInputBorder(),
             filled: true,

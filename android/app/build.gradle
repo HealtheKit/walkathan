@@ -7,12 +7,26 @@ plugins {
 
 def keystoreProperties = new Properties()
 def keystorePropertiesFile = rootProject.file('key.properties')
-if (keystorePropertiesFile.exists()) {
+def hasKeystoreProperties = keystorePropertiesFile.exists()
+if (hasKeystoreProperties) {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 }
 
+// Fail fast (instead of silently falling back to debug signing) if a release
+// build is requested without android/key.properties. See docs/google-play-release.md.
+gradle.taskGraph.whenReady { taskGraph ->
+    def buildingRelease = taskGraph.allTasks.any { it.name.toLowerCase().contains('release') }
+    if (buildingRelease && !hasKeystoreProperties) {
+        throw new GradleException(
+            "Release build requested but android/key.properties is missing.\n" +
+            "Create android/key.properties with storePassword, keyPassword, keyAlias, and storeFile " +
+            "before running a release build. See docs/google-play-release.md for instructions."
+        )
+    }
+}
+
 android {
-    namespace = "com.tresundios.walkathan"
+    namespace = "com.tresundios.walkathon"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -26,9 +40,9 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.walkathan.app"
+        applicationId = "com.tresundios.walkathon"
         minSdkVersion = flutter.minSdkVersion
-        targetSdk = 34
+        targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }

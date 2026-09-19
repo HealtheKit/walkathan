@@ -11,10 +11,10 @@ import 'package:go_router/go_router.dart';
 class WalkHomePage extends ConsumerStatefulWidget {
   final String userId;
 
-  const WalkHomePage({required this.userId, Key? key}) : super(key: key);
+  const WalkHomePage({required this.userId, super.key});
 
   @override
-  _WalkHomePageState createState() => _WalkHomePageState();
+  ConsumerState<WalkHomePage> createState() => _WalkHomePageState();
 }
 
 class _WalkHomePageState extends ConsumerState<WalkHomePage> {

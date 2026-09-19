@@ -1,16 +1,31 @@
-# walkathan
+# Walkathan
 
-A new Flutter project.
+A Flutter app for tracking steps during a walkathon event. Users sign in
+(Supabase Auth), track their step count via the device pedometer, and view
+results on a leaderboard.
 
-## Getting Started
+Built with Flutter, Riverpod, `go_router`, and Supabase (auth + data).
 
-This project is a starting point for a Flutter application.
+## Getting started
 
-A few resources to get you started if this is your first Flutter project:
+Install dependencies:
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+```
+flutter pub get
+```
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Run on a connected device or emulator:
+
+```
+flutter run
+```
+
+Run static analysis and tests:
+
+```
+flutter analyze
+flutter test
+```
+
+For Android release/Google Play internal-testing build instructions, see
+[docs/google-play-release.md](docs/google-play-release.md).

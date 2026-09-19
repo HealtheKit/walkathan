@@ -13,7 +13,7 @@ class LeaderBoardPage extends ConsumerStatefulWidget {
   const LeaderBoardPage({super.key});
 
   @override
-  _LeaderBoardPageState createState() => _LeaderBoardPageState();
+  ConsumerState<LeaderBoardPage> createState() => _LeaderBoardPageState();
 }
 
 class _LeaderBoardPageState extends ConsumerState<LeaderBoardPage> {

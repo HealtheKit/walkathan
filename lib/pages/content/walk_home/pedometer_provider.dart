@@ -126,11 +126,11 @@ class PedometerManager {
     state = state.copyWith(status: event.status);
   }
 
-  void onPedestrianStatusError(error) {
+  void onPedestrianStatusError(Object error) {
     state = state.copyWith(status: 'Pedestrian Status not available');
   }
 
-  void onStepCountError(error) {
+  void onStepCountError(Object error) {
     state = state.copyWith(steps: 'Step Count not available');
   }
 

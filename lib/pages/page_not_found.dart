@@ -5,9 +5,9 @@ import '../config/router/route_names.dart';
 class PageNotFound extends StatelessWidget {
   final String errorMessage;
   const PageNotFound({
-    Key? key,
+    super.key,
     required this.errorMessage,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import '../constants/firebase_constants.dart';
 
 class WalkStepRepository {
@@ -21,7 +22,7 @@ class WalkStepRepository {
           .maybeSingle();
       return data?['last_day'] as String?;
     } catch (e) {
-      print('Error fetching last day: $e');
+      debugPrint('Error fetching last day: $e');
       return null;
     }
   }
@@ -36,7 +37,7 @@ class WalkStepRepository {
         'updated_at': DateTime.now().toIso8601String(),
       }, onConflict: 'user_id,date_key');
     } catch (e) {
-      print('Error saving last day: $e');
+      debugPrint('Error saving last day: $e');
     }
   }
 
@@ -66,7 +67,7 @@ class WalkStepRepository {
         'updated_at': DateTime.now().toIso8601String(),
       }, onConflict: 'user_id,date_key');
     } catch (e) {
-      print('Error saving step count: $e');
+      debugPrint('Error saving step count: $e');
     }
   }
 
@@ -153,7 +154,7 @@ class WalkStepRepository {
         return data['count'] as int;
       }
     } catch (e) {
-      print('Error fetching initial step count: $e');
+      debugPrint('Error fetching initial step count: $e');
     }
     return 0;
   }
