@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import '../../../config/router/route_names.dart';
 import '../../../models/custom_error.dart';
 import '../../../utils/error_dialog.dart';
+import '../../../theme/app_spacing.dart';
+import '../../widgets/auth_layout.dart';
 import '../../widgets/buttons.dart';
 import '../../widgets/form_fields.dart';
 import 'signin_provider.dart';
@@ -60,87 +62,51 @@ class _SigninPageState extends ConsumerState<SigninPage> {
 
     final signinState = ref.watch(signinProvider);
 
-    return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
-      child: Scaffold(
-        body: Center(
-          child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              
-                child: Form(
-                  key: _formKey,
-                  autovalidateMode: _autovalidateMode,
-                  child: ListView(
-                    shrinkWrap: true,
-                    reverse: true,
-                    children: [
-                      Image.asset('assets/images/logo.png', width: 200, height: 200,),
-                      Center(
-                        child: 
-                          Text(
-                          'TEF Walkathon',
-                          style: TextStyle(
-                            fontSize: 40,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20.0),
-                      EmailFormField(emailController: _emailController),
-                      const SizedBox(height: 20.0),
-                      PasswordFormField(
-                        passwordController: _passwordController,
-                        labelText: 'Password',
-                      ),
-                      const SizedBox(height: 20.0),
-                      CustomFilledButton(
-                        onPressed: signinState.maybeWhen(
-                          loading: () => null,
-                          orElse: () => _submit,
-                        ),
-                        fontSize: 20.0,
-                        fontWeight: FontWeight.w600,
-                        child: Text(
-                          signinState.maybeWhen(
-                            loading: () => 'Submitting...',
-                            orElse: () => 'Sign In',
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20.0),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Text('Not a member? '),
-                          CustomTextButton(
-                            onPressed: signinState.maybeWhen(
-                              loading: () => null,
-                              orElse: () =>
-                                  () => context.goNamed(RouteNames.signup),
-                            ),
-                            fontSize: 18.0,
-                            fontWeight: FontWeight.bold,
-                            child: const Text('Sign Up!'),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-                      CustomTextButton(
-                        onPressed: signinState.maybeWhen(
-                          loading: () => null,
-                          orElse: () =>
-                              () => context.goNamed(RouteNames.resetPassword),
-                        ),
-                        fontSize: 16.0,
-                        fontWeight: FontWeight.bold,
-                        child: const Text('Forgot Password?'),
-                      )
-                    ].reversed.toList(),
-                  ),
+    return AuthLayout(
+      title: 'Welcome back',
+      subtitle: 'Sign in to track your steps for the TEF Walkathon.',
+      children: [
+        Form(
+          key: _formKey,
+          autovalidateMode: _autovalidateMode,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              EmailFormField(emailController: _emailController),
+              const SizedBox(height: AppSpacing.lg),
+              PasswordFormField(
+                passwordController: _passwordController,
+                labelText: 'Password',
+              ),
+              Align(
+                alignment: Alignment.centerRight,
+                child: AppTextButton(
+                  label: 'Forgot password?',
+                  onPressed: signinState.isLoading
+                      ? null
+                      : () => context.goNamed(RouteNames.resetPassword),
                 ),
               ),
-            ),
+              const SizedBox(height: AppSpacing.sm),
+              AppButton(
+                label: 'Sign In',
+                loading: signinState.isLoading,
+                onPressed: _submit,
+              ),
+            ],
+          ),
         ),
+        const SizedBox(height: AppSpacing.xl),
+        AuthFooter(
+          prompt: 'Not a member?',
+          action: AppTextButton(
+            label: 'Sign up',
+            onPressed: signinState.isLoading
+                ? null
+                : () => context.goNamed(RouteNames.signup),
+          ),
+        ),
+      ],
     );
   }
 }

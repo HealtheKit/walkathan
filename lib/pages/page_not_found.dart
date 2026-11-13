@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+
 import '../config/router/route_names.dart';
+import 'widgets/buttons.dart';
+import 'widgets/state_widgets.dart';
 
 class PageNotFound extends StatelessWidget {
   final String errorMessage;
@@ -12,29 +15,29 @@ class PageNotFound extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(30),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                errorMessage,
-                style: const TextStyle(fontSize: 18, color: Colors.red),
-                textAlign: TextAlign.center,
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: StateMessage(
+                icon: Icons.explore_off_outlined,
+                title: "We couldn't find that page",
+                message: errorMessage,
               ),
-              const SizedBox(height: 20),
-              OutlinedButton(
-                onPressed: () {
-                  GoRouter.of(context).goNamed(RouteNames.home);
-                },
-                child: const Text(
-                  'Home',
-                  style: TextStyle(fontSize: 20),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 360),
+                child: AppButton(
+                  label: 'Go to Home',
+                  icon: Icons.home_outlined,
+                  onPressed: () =>
+                      GoRouter.of(context).goNamed(RouteNames.home),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

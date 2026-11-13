@@ -1,6 +1,56 @@
 import 'package:flutter/material.dart';
 import 'package:validators/validators.dart';
 
+/// Password input with a show/hide toggle.
+class _ObscurableField extends StatefulWidget {
+  const _ObscurableField({
+    required this.controller,
+    required this.label,
+    required this.validator,
+    this.autofillHints,
+    this.textInputAction,
+  });
+
+  final TextEditingController? controller;
+  final String label;
+  final String? Function(String?) validator;
+  final Iterable<String>? autofillHints;
+  final TextInputAction? textInputAction;
+
+  @override
+  State<_ObscurableField> createState() => _ObscurableFieldState();
+}
+
+class _ObscurableFieldState extends State<_ObscurableField> {
+  bool _obscured = true;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      controller: widget.controller,
+      obscureText: _obscured,
+      autocorrect: false,
+      enableSuggestions: false,
+      autofillHints: widget.autofillHints,
+      textInputAction: widget.textInputAction,
+      decoration: InputDecoration(
+        labelText: widget.label,
+        prefixIcon: const Icon(Icons.lock_outline),
+        suffixIcon: IconButton(
+          tooltip: _obscured ? 'Show password' : 'Hide password',
+          icon: Icon(
+            _obscured
+                ? Icons.visibility_outlined
+                : Icons.visibility_off_outlined,
+          ),
+          onPressed: () => setState(() => _obscured = !_obscured),
+        ),
+      ),
+      validator: widget.validator,
+    );
+  }
+}
+
 class ConfirmPasswordFormField extends StatelessWidget {
   const ConfirmPasswordFormField({
     super.key,
@@ -13,14 +63,10 @@ class ConfirmPasswordFormField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
-      obscureText: true,
-      decoration: const InputDecoration(
-        border: OutlineInputBorder(),
-        filled: true,
-        labelText: 'Confirm password',
-        prefixIcon: Icon(Icons.lock),
-      ),
+    return _ObscurableField(
+      controller: null,
+      label: 'Confirm password',
+      textInputAction: TextInputAction.done,
       validator: (String? value) {
         if (_passwordController.text != value) {
           return 'Passwords not match';
@@ -43,15 +89,11 @@ class PasswordFormField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
+    return _ObscurableField(
       controller: _passwordController,
-      obscureText: true,
-      decoration: const InputDecoration(
-        border: OutlineInputBorder(),
-        filled: true,
-        labelText: 'Password',
-        prefixIcon: Icon(Icons.lock),
-      ),
+      label: 'Password',
+      autofillHints: const [AutofillHints.password],
+      textInputAction: TextInputAction.next,
       validator: (String? value) {
         if (value == null || value.trim().isEmpty) {
           return 'Password required';
@@ -78,13 +120,13 @@ class EmailFormField extends StatelessWidget {
     return TextFormField(
       controller: _emailController,
       keyboardType: TextInputType.emailAddress,
+      textInputAction: TextInputAction.next,
+      autofillHints: const [AutofillHints.email],
       autocorrect: false,
       decoration: const InputDecoration(
-        border: OutlineInputBorder(),
-        filled: true,
         labelText: 'Email',
         hintText: 'your@email.com',
-        prefixIcon: Icon(Icons.email),
+        prefixIcon: Icon(Icons.mail_outline),
       ),
       validator: (String? value) {
         if (value == null || value.trim().isEmpty) {
@@ -111,11 +153,12 @@ class NameFormField extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextFormField(
       controller: _nameController,
+      textInputAction: TextInputAction.next,
+      textCapitalization: TextCapitalization.words,
+      autofillHints: const [AutofillHints.givenName],
       decoration: const InputDecoration(
-        border: OutlineInputBorder(),
-        filled: true,
         labelText: 'Name',
-        prefixIcon: Icon(Icons.account_box),
+        prefixIcon: Icon(Icons.person_outline),
       ),
       validator: (String? value) {
         if (value == null || value.trim().isEmpty) {
@@ -145,11 +188,10 @@ class GenderFormField extends StatelessWidget {
       builder: (context, selectedGender, _) {
         return DropdownButtonFormField<String>(
           initialValue: selectedGender,
+          borderRadius: BorderRadius.circular(12),
           decoration: const InputDecoration(
-            border: OutlineInputBorder(),
-            filled: true,
             labelText: 'Gender',
-            prefixIcon: Icon(Icons.person),
+            prefixIcon: Icon(Icons.wc_outlined),
           ),
           items: const [
             DropdownMenuItem(value: 'male', child: Text('Male')),

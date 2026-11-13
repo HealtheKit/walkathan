@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../repositories/auth_repository_provider.dart';
-import '../../../utils/error_dialog.dart';
-import '../../../models/custom_error.dart';
+import '../../../theme/app_colors.dart';
+import '../../../theme/app_spacing.dart';
+import '../../../theme/app_theme.dart';
+import '../../widgets/app_shell.dart';
 import './pedometer_provider.dart';
-import '../home/home_provider.dart';
-import 'package:go_router/go_router.dart';
 
 class WalkHomePage extends ConsumerStatefulWidget {
   final String userId;
@@ -47,158 +46,160 @@ class _WalkHomePageState extends ConsumerState<WalkHomePage> {
   Widget build(BuildContext context) {
     final pedometerState = _pedometerManager.state;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Walkathan Home'),
-        backgroundColor: Colors.blue,
-        actions: [
-          IconButton(
-            onPressed: () async {
-              try {
-                await ref.read(authRepositoryProvider).signout();
-              } on CustomError catch (e) {
-                if (!context.mounted) return;
-                errorDialog(context, e);
-              }
-            },
-            icon: const Icon(Icons.logout),
-          ),
-          IconButton(
-            onPressed: () {
-              ref.invalidate(profileProvider);
-            },
-            icon: const Icon(Icons.refresh),
-          ),
-        ],
-        flexibleSpace: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: <Color>[
-                Colors.blue,
-                Colors.red,
-              ],
-            ),
-          ),
+    return AppShell(
+      current: AppTab.walk,
+      title: 'Walk',
+      body: PageContainer(
+        child: ListView(
+          padding: AppSpacing.pagePadding,
+          children: [
+            _StepsCard(state: pedometerState),
+            const SizedBox(height: AppSpacing.lg),
+            _StatusCard(status: pedometerState.status),
+          ],
         ),
       ),
-      body: Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage('assets/images/walkbg.png'),
-            fit: BoxFit.cover,
-          ),
-          gradient: LinearGradient(
-            begin: Alignment.topRight,
-            end: Alignment.bottomLeft,
-            colors: [
-              Colors.blue,
-              Colors.red,
+    );
+  }
+}
+
+class _StepsCard extends StatelessWidget {
+  const _StepsCard({required this.state});
+
+  final PedometerState state;
+
+  @override
+  Widget build(BuildContext context) {
+    final text = Theme.of(context).textTheme;
+    final scheme = Theme.of(context).colorScheme;
+    final updated = state.lastUpdate != null
+        ? 'Last updated ${DateFormat('HH:mm').format(state.lastUpdate!)}'
+        : 'No updates yet';
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.xl,
+          vertical: AppSpacing.xxl,
+        ),
+        child: Semantics(
+          label: '${state.count} steps taken. $updated',
+          excludeSemantics: true,
+          child: Column(
+            children: [
+              Text(
+                'STEPS TAKEN',
+                style: text.labelMedium?.copyWith(
+                  color: scheme.onSurfaceVariant,
+                  letterSpacing: 1.2,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  NumberFormat.decimalPattern().format(state.count),
+                  style: text.displayLarge?.copyWith(
+                    color: scheme.primary,
+                    fontFeatures: AppTheme.tabularFigures,
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.schedule, size: 16, color: scheme.onSurfaceVariant),
+                  const SizedBox(width: 6),
+                  Text(
+                    updated,
+                    style: text.bodySmall
+                        ?.copyWith(color: scheme.onSurfaceVariant),
+                  ),
+                ],
+              ),
             ],
           ),
         ),
-        child: Align(
-          alignment: FractionalOffset.center,
-          child: Container(
-            padding: EdgeInsets.all(20.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                Card(
-                  elevation: 4,
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      children: [
-                        Text(
-                          'Steps Taken',
-                          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          pedometerState.count.toString(),
-                          style: TextStyle(fontSize: 48, color: Colors.blue),
-                        ),
-                        Text(
-                          pedometerState.lastUpdate != null
-                              ? 'Last updated: ${DateFormat('HH:mm').format(pedometerState.lastUpdate!)}'
-                              : 'No updates yet',
-                          style: TextStyle(fontSize: 12, color: Colors.grey),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                SizedBox(height: 20),
-                Card(
-                  elevation: 4,
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      children: [
-                        Text(
-                          'Pedestrian Status',
-                          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(height: 10),
-                        Icon(
-                          pedometerState.status == 'walking'
-                              ? Icons.directions_walk
-                              : pedometerState.status == 'stopped'
-                                  ? Icons.accessibility_new
-                                  : Icons.error,
-                          size: 80,
-                          color: pedometerState.status == 'walking'
-                              ? Colors.green
-                              : pedometerState.status == 'stopped'
-                                  ? Colors.blue
-                                  : Colors.red,
-                        ),
-                        Text(
-                          pedometerState.status,
-                          style: TextStyle(
-                            fontSize: 20,
-                            color: pedometerState.status == 'walking' || pedometerState.status == 'stopped'
-                                ? Colors.black
-                                : Colors.red,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 40),
-                OutlinedButton(
-                  onPressed: () {
-                    GoRouter.of(context).go('/home');
-                  },
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Colors.white, width: 2),
-                    foregroundColor: Colors.white,
-                  ),
-                  child: const Text(
-                    'Home',
-                    style: TextStyle(fontSize: 20),
-                  ),
-                ),
-                const SizedBox(height: 40),
-                OutlinedButton(
-                  onPressed: () {
-                    GoRouter.of(context).go('/leaderBoard');
-                  },
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Colors.white, width: 2),
-                    foregroundColor: Colors.white,
-                  ),
-                  child: const Text(
-                    'Leader Board',
-                    style: TextStyle(fontSize: 20),
-                  ),
-                ),
-              ],
+      ),
+    );
+  }
+}
+
+class _StatusCard extends StatelessWidget {
+  const _StatusCard({required this.status});
+
+  final String status;
+
+  @override
+  Widget build(BuildContext context) {
+    final text = Theme.of(context).textTheme;
+    final scheme = Theme.of(context).colorScheme;
+    final brand = context.brand;
+
+    final IconData icon;
+    final Color color;
+    final String title;
+    String? detail;
+
+    switch (status) {
+      case 'walking':
+        icon = Icons.directions_walk;
+        color = brand.success;
+        title = 'Walking';
+      case 'stopped':
+        icon = Icons.accessibility_new;
+        color = scheme.primary;
+        title = 'Stopped';
+      case '?':
+        icon = Icons.sensors;
+        color = scheme.onSurfaceVariant;
+        title = 'Waiting for sensor';
+        detail = 'Start walking and your status will appear here.';
+      default:
+        icon = Icons.sensors_off;
+        color = scheme.error;
+        title = 'Status unavailable';
+        detail = status;
+    }
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.lg),
+        child: Row(
+          children: [
+            Container(
+              width: 56,
+              height: 56,
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: .14),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, size: 28, color: color),
             ),
-          ),
+            const SizedBox(width: AppSpacing.lg),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Pedestrian status',
+                    style: text.bodySmall
+                        ?.copyWith(color: scheme.onSurfaceVariant),
+                  ),
+                  Text(title, style: text.titleLarge),
+                  if (detail != null) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      detail,
+                      style: text.bodyMedium
+                          ?.copyWith(color: scheme.onSurfaceVariant),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );

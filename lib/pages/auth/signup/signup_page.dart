@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import '../../../config/router/route_names.dart';
 import '../../../models/custom_error.dart';
 import '../../../utils/error_dialog.dart';
+import '../../../theme/app_spacing.dart';
+import '../../widgets/auth_layout.dart';
 import '../../widgets/buttons.dart';
 import '../../widgets/form_fields.dart';
 import 'signup_provider.dart';
@@ -66,74 +68,51 @@ class _SignupPageState extends ConsumerState<SignupPage> {
 
     final signupState = ref.watch(signupProvider);
 
-    return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
-      child: Scaffold(
-        body: Center(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 30.0),
-            child: Form(
-              key: _formKey,
-              autovalidateMode: _autovalidateMode,
-              child: ListView(
-                shrinkWrap: true,
-                reverse: true,
-                children: [
-                  Image.asset('assets/images/logo.png', width: 200, height: 200,),
-                  const SizedBox(height: 20.0),
-                  NameFormField(nameController: _nameController),
-                  const SizedBox(height: 20.0),
-                  EmailFormField(emailController: _emailController),
-                  const SizedBox(height: 20.0),
-                  PasswordFormField(
-                    passwordController: _passwordController,
-                    labelText: 'Password',
-                  ),
-                  const SizedBox(height: 20.0),
-                  ConfirmPasswordFormField(
-                    passwordController: _passwordController,
-                    labelText: 'Confirm password',
-                  ),
-                  const SizedBox(height: 20.0),
-                  GenderFormField(genderController: _genderController),
-                  const SizedBox(height: 20.0),
-                  CustomFilledButton(
-                    onPressed: signupState.maybeWhen(
-                      loading: () => null,
-                      orElse: () => _submit,
-                    ),
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.w600,
-                    child: Text(
-                      signupState.maybeWhen(
-                        loading: () => 'Submitting...',
-                        orElse: () => 'Sign UP',
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text('Already a member? '),
-                      CustomTextButton(
-                        onPressed: signupState.maybeWhen(
-                          loading: () => null,
-                          orElse: () => () =>
-                              GoRouter.of(context).goNamed(RouteNames.signin),
-                        ),
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.bold,
-                        child: const Text('Sign In!'),
-                      ),
-                    ],
-                  ),
-                ].reversed.toList(),
+    return AuthLayout(
+      title: 'Create your account',
+      subtitle: 'Join the walk and see where you rank.',
+      children: [
+        Form(
+          key: _formKey,
+          autovalidateMode: _autovalidateMode,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              NameFormField(nameController: _nameController),
+              const SizedBox(height: AppSpacing.lg),
+              EmailFormField(emailController: _emailController),
+              const SizedBox(height: AppSpacing.lg),
+              PasswordFormField(
+                passwordController: _passwordController,
+                labelText: 'Password',
               ),
-            ),
+              const SizedBox(height: AppSpacing.lg),
+              ConfirmPasswordFormField(
+                passwordController: _passwordController,
+                labelText: 'Confirm password',
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              GenderFormField(genderController: _genderController),
+              const SizedBox(height: AppSpacing.xl),
+              AppButton(
+                label: 'Sign Up',
+                loading: signupState.isLoading,
+                onPressed: _submit,
+              ),
+            ],
           ),
         ),
-      ),
+        const SizedBox(height: AppSpacing.xl),
+        AuthFooter(
+          prompt: 'Already a member?',
+          action: AppTextButton(
+            label: 'Sign in',
+            onPressed: signupState.isLoading
+                ? null
+                : () => GoRouter.of(context).goNamed(RouteNames.signin),
+          ),
+        ),
+      ],
     );
   }
 }

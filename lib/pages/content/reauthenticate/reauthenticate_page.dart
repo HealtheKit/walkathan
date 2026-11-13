@@ -4,6 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../models/custom_error.dart';
 import '../../../repositories/auth_repository_provider.dart';
 import '../../../utils/error_dialog.dart';
+import '../../../theme/app_spacing.dart';
+import '../../widgets/auth_layout.dart';
+import '../../widgets/buttons.dart';
 import '../../widgets/form_fields.dart';
 
 class ReauthenticatePage extends ConsumerStatefulWidget {
@@ -65,57 +68,35 @@ class _ReauthenticatePageState extends ConsumerState<ReauthenticatePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Reauthenticate'),
-      ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 30),
-          child: Form(
-            key: _formKey,
-            autovalidateMode: _autovalidateMode,
-            child: ListView(
-              shrinkWrap: true,
-              reverse: true,
-              children: [
-                const Text(
-                  'This is a security-sensitive operation\nyou must have recently signed-in!',
-                  style: TextStyle(
-                    color: Colors.red,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18.0,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 40.0),
-                EmailFormField(emailController: _emailController),
-                const SizedBox(height: 20.0),
-                PasswordFormField(
-                  passwordController: _passwordController,
-                  labelText: 'Password',
-                ),
-                const SizedBox(height: 20.0),
-                ElevatedButton(
-                  onPressed: submitting ? null : _submit,
-                  style: ElevatedButton.styleFrom(
-                    textStyle: const TextStyle(
-                      fontSize: 20.0,
-                      fontWeight: FontWeight.w600,
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 10.0,
-                    ),
-                  ),
-                  child: Text(
-                    submitting ? 'Submitting...' : 'Reauthenticate',
-                  ),
-                ),
-              ].reversed.toList(),
-            ),
+    return AuthLayout(
+      appBar: AppBar(title: const Text('Reauthenticate')),
+      title: 'Confirm it\'s you',
+      subtitle:
+          'This is a security-sensitive operation. Please sign in again to continue.',
+      showLogo: false,
+      children: [
+        Form(
+          key: _formKey,
+          autovalidateMode: _autovalidateMode,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              EmailFormField(emailController: _emailController),
+              const SizedBox(height: AppSpacing.lg),
+              PasswordFormField(
+                passwordController: _passwordController,
+                labelText: 'Password',
+              ),
+              const SizedBox(height: AppSpacing.xl),
+              AppButton(
+                label: 'Reauthenticate',
+                loading: submitting,
+                onPressed: _submit,
+              ),
+            ],
           ),
         ),
-      ),
+      ],
     );
   }
 }

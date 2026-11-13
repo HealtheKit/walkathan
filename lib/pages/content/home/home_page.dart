@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../config/router/route_names.dart';
 import '../../../constants/firebase_constants.dart';
+import '../../../models/app_user.dart';
 import '../../../models/custom_error.dart';
-import '../../../repositories/auth_repository_provider.dart';
-import '../../../utils/error_dialog.dart';
+import '../../../theme/app_spacing.dart';
+import '../../widgets/app_shell.dart';
+import '../../widgets/state_widgets.dart';
 import 'home_provider.dart';
 
 class HomePage extends ConsumerWidget {
@@ -17,161 +18,216 @@ class HomePage extends ConsumerWidget {
     final uid = supabaseClient.auth.currentUser!.id;
     final profileState = ref.watch(profileProvider(uid));
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Home'),
-        actions: [
-          IconButton(
-            onPressed: () async {
-              try {
-                await ref.read(authRepositoryProvider).signout();
-              } on CustomError catch (e) {
-                if (!context.mounted) return;
-                errorDialog(context, e);
-              }
-            },
-            icon: const Icon(Icons.logout),
-          ),
-          IconButton(
-            onPressed: () {
-              ref.invalidate(profileProvider);
-            },
-            icon: const Icon(Icons.refresh),
-          ),
-        ],
-        flexibleSpace: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: <Color>[
-                Colors.blue, // Start color
-                Colors.red, // End color
-              ],
-            ),
-          ),
-        ),
-      ),
+    return AppShell(
+      current: AppTab.home,
+      title: 'Home',
+      onRefresh: () => ref.invalidate(profileProvider),
       body: profileState.when(
         skipLoadingOnRefresh: false,
-        data: (appUser) {
-          return Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topRight,
-                end: Alignment.bottomLeft,
-                colors: [
-                  Colors.blue,
-                  Colors.red,
-                ],
-              )
-            ),
-            child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Image.asset('assets/images/logo.png', width: 200, height: 200,),
-                Text(
-                  'Welcome ${appUser.name}',
-                  style: const TextStyle(fontSize: 24.0),
-                ),
-                const SizedBox(height: 20.0),
-                const Text(
-                  'Your Profile',
-                  style: TextStyle(fontSize: 24.0),
-                ),
-                const SizedBox(height: 10.0),
-                Text(
-                  'email: ${appUser.email}',
-                  style: const TextStyle(fontSize: 16.0),
-                ),
-                const SizedBox(height: 10.0),
-                Text(
-                  'id: ${appUser.id}',
-                  style: const TextStyle(fontSize: 16.0),
-                ),
-                const SizedBox(height: 40),
-                OutlinedButton(
-                  onPressed: () {
-                    GoRouter.of(context).goNamed(RouteNames.changePassword);
-                  },
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Colors.yellow, width: 2), // Gold border
-                    foregroundColor: Colors.yellow, // Text color
-                  ),
-                  child: const Text(
-                    'Change Password',
-                    style: TextStyle(fontSize: 20),
-                  ),
-                ),
-                const SizedBox(height: 40),
-                OutlinedButton(
-                  onPressed: () {
-                    GoRouter.of(context).go('/walkHome/$uid');
-                  },
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Colors.yellow, width: 2), // Gold border
-                    foregroundColor: Colors.yellow, // Text color
-                  ),
-                  child: const Text(
-                    'Walkathon Home',
-                    style: TextStyle(fontSize: 20),
-                  ),
-                ),
-                const SizedBox(height: 40),
-                OutlinedButton(
-                  onPressed: () {
-                    GoRouter.of(context).go('/leaderBoard');
-                  },
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Colors.yellow, width: 2), // Gold border
-                    foregroundColor: Colors.yellow, // Text color
-                  ),
-                  child: const Text(
-                    'Leader Board',
-                    style: TextStyle(fontSize: 20),
-                  ),
-                )
-              ],
-            ),
-            ),
-          );
-        },
+        data: (appUser) => _HomeContent(appUser: appUser, uid: uid),
         error: (e, _) {
           final error = e is CustomError
               ? e
               : CustomError(code: 'error', message: e.toString(), plugin: '');
-
-          return Center(
-            child: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.error_outline, color: Colors.red, size: 48),
-                  const SizedBox(height: 16),
-                  Text(
-                    error.message,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      color: Colors.red,
-                      fontSize: 18,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  OutlinedButton.icon(
-                    onPressed: () => ref.invalidate(profileProvider),
-                    icon: const Icon(Icons.refresh),
-                    label: const Text('Retry'),
-                  ),
-                ],
-              ),
-            ),
+          return ErrorState(
+            message: error.message,
+            onRetry: () => ref.invalidate(profileProvider),
           );
         },
-        loading: () => const Center(
-          child: CircularProgressIndicator(),
+        loading: () => const PageContainer(child: _HomeSkeleton()),
+      ),
+    );
+  }
+}
+
+class _HomeContent extends StatelessWidget {
+  const _HomeContent({required this.appUser, required this.uid});
+
+  final AppUser appUser;
+  final String uid;
+
+  @override
+  Widget build(BuildContext context) {
+    final text = Theme.of(context).textTheme;
+    final scheme = Theme.of(context).colorScheme;
+    final initial =
+        appUser.name.trim().isEmpty ? '?' : appUser.name.trim()[0].toUpperCase();
+
+    final cards = [
+      _ActionCard(
+        icon: Icons.directions_walk,
+        title: 'Walkathon Home',
+        description: 'Track your steps and activity live.',
+        onTap: () => GoRouter.of(context).go('/walkHome/$uid'),
+      ),
+      _ActionCard(
+        icon: Icons.emoji_events,
+        title: 'Leader Board',
+        description: 'See the top walkers over the last 30 days.',
+        onTap: () => GoRouter.of(context).go('/leaderBoard'),
+      ),
+    ];
+
+    return PageContainer(
+      child: ListView(
+        padding: AppSpacing.pagePadding,
+        children: [
+          Row(
+            children: [
+              CircleAvatar(
+                radius: 32,
+                backgroundColor: scheme.primaryContainer,
+                child: Text(
+                  initial,
+                  style: text.headlineSmall
+                      ?.copyWith(color: scheme.onPrimaryContainer),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.lg),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Welcome back', style: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant)),
+                    Text(
+                      appUser.name,
+                      style: text.headlineSmall,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Text(
+                      appUser.email,
+                      style: text.bodyMedium
+                          ?.copyWith(color: scheme.onSurfaceVariant),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.xl),
+          Text('Jump in', style: text.titleMedium),
+          const SizedBox(height: AppSpacing.md),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              if (constraints.maxWidth >= 560) {
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Expanded(child: cards[0]),
+                    const SizedBox(width: AppSpacing.lg),
+                    Expanded(child: cards[1]),
+                  ],
+                );
+              }
+              return Column(
+                children: [
+                  cards[0],
+                  const SizedBox(height: AppSpacing.md),
+                  cards[1],
+                ],
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ActionCard extends StatelessWidget {
+  const _ActionCard({
+    required this.icon,
+    required this.title,
+    required this.description,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String title;
+  final String description;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final text = Theme.of(context).textTheme;
+    final scheme = Theme.of(context).colorScheme;
+
+    return Card(
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: scheme.primaryContainer,
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusField),
+                ),
+                child: Icon(icon, color: scheme.onPrimaryContainer),
+              ),
+              const SizedBox(width: AppSpacing.lg),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(title, style: text.titleMedium),
+                    const SizedBox(height: 2),
+                    Text(
+                      description,
+                      style: text.bodyMedium
+                          ?.copyWith(color: scheme.onSurfaceVariant),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(Icons.chevron_right, color: scheme.onSurfaceVariant),
+            ],
+          ),
         ),
+      ),
+    );
+  }
+}
+
+class _HomeSkeleton extends StatelessWidget {
+  const _HomeSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: AppSpacing.pagePadding,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: const [
+          Row(
+            children: [
+              SkeletonBox(width: 64, height: 64, radius: 32),
+              SizedBox(width: AppSpacing.lg),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SkeletonBox(width: 90, height: 14),
+                    SizedBox(height: 8),
+                    SkeletonBox(width: 180, height: 22),
+                    SizedBox(height: 8),
+                    SkeletonBox(width: 140, height: 14),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: AppSpacing.xl),
+          SkeletonBox(height: 80, radius: AppSpacing.radiusCard),
+          SizedBox(height: AppSpacing.md),
+          SkeletonBox(height: 80, radius: AppSpacing.radiusCard),
+        ],
       ),
     );
   }

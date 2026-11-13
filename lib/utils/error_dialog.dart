@@ -11,10 +11,11 @@ void errorDialog(BuildContext context, CustomError e) {
       context: context,
       builder: (context) {
         return CupertinoAlertDialog(
-          title: const Text('Error'),
+          title: const Text('Something went wrong'),
           content: Text(e.message),
           actions: [
             CupertinoDialogAction(
+              isDefaultAction: true,
               child: const Text('OK'),
               onPressed: () => Navigator.pop(context),
             ),
@@ -26,11 +27,15 @@ void errorDialog(BuildContext context, CustomError e) {
     showDialog(
       context: context,
       builder: (context) {
+        final scheme = Theme.of(context).colorScheme;
         return AlertDialog(
-          title: const Text('Error'),
+          icon: Icon(Icons.error_outline, color: scheme.error, size: 32),
+          title: const Text('Something went wrong'),
           content: Text(e.message),
+          actionsAlignment: MainAxisAlignment.end,
           actions: [
-            TextButton(
+            FilledButton(
+              style: FilledButton.styleFrom(minimumSize: const Size(88, 44)),
               child: const Text('OK'),
               onPressed: () => Navigator.pop(context),
             ),

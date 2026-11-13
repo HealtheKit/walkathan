@@ -4,7 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../constants/firebase_constants.dart';
 import '../../../models/custom_error.dart';
 import '../../../repositories/auth_repository_provider.dart';
+import '../../../theme/app_spacing.dart';
 import '../../../utils/error_dialog.dart';
+import '../../widgets/auth_layout.dart';
+import '../../widgets/buttons.dart';
 
 // With Supabase, email verification is handled via confirmation links.
 // If "Enable email confirmations" is on in the Supabase dashboard,
@@ -18,63 +21,72 @@ class VerifyEmailPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final email = supabaseClient.auth.currentUser?.email ?? '';
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Email Verification'),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                children: [
-                  const Text('A verification email has been sent to'),
-                  Text(email),
-                  const SizedBox(height: 10),
-                  const Text('Please click the link in the email to verify.'),
-                  const SizedBox(height: 10),
-                  const Text('If you cannot find the verification email,'),
-                  RichText(
-                    text: TextSpan(
-                      text: 'Please check ',
-                      style: DefaultTextStyle.of(context)
-                          .style
-                          .copyWith(fontSize: 18),
-                      children: const [
-                        TextSpan(
-                          text: 'SPAM',
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.red,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        TextSpan(text: ' folder.'),
-                      ],
-                    ),
-                  ),
-                ],
+    final text = Theme.of(context).textTheme;
+    final scheme = Theme.of(context).colorScheme;
+
+    return AuthLayout(
+      appBar: AppBar(title: const Text('Email Verification')),
+      title: 'Check your inbox',
+      subtitle: 'A verification email has been sent to',
+      showLogo: false,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          decoration: BoxDecoration(
+            color: scheme.primaryContainer,
+            borderRadius: BorderRadius.circular(AppSpacing.radiusField),
+          ),
+          child: Row(
+            children: [
+              Icon(Icons.mark_email_unread_outlined,
+                  color: scheme.onPrimaryContainer),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Text(
+                  email,
+                  style: text.titleMedium
+                      ?.copyWith(color: scheme.onPrimaryContainer),
+                ),
               ),
-            ),
-            OutlinedButton(
-              onPressed: () async {
-                try {
-                  await ref.read(authRepositoryProvider).signout();
-                } on CustomError catch (e) {
-                  if (!context.mounted) return;
-                  errorDialog(context, e);
-                }
-              },
-              child: const Text(
-                'CANCEL',
-                style: TextStyle(fontSize: 20.0),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
+        const SizedBox(height: AppSpacing.lg),
+        Text(
+          'Please click the link in the email to verify your account.',
+          style: text.bodyLarge,
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        Text.rich(
+          TextSpan(
+            text: "Can't find it? Check your ",
+            children: [
+              TextSpan(
+                text: 'spam',
+                style: TextStyle(
+                  color: scheme.error,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const TextSpan(text: ' folder.'),
+            ],
+          ),
+          style: text.bodyLarge?.copyWith(color: scheme.onSurfaceVariant),
+        ),
+        const SizedBox(height: AppSpacing.xl),
+        AppButton(
+          label: 'Cancel',
+          variant: AppButtonVariant.outlined,
+          onPressed: () async {
+            try {
+              await ref.read(authRepositoryProvider).signout();
+            } on CustomError catch (e) {
+              if (!context.mounted) return;
+              errorDialog(context, e);
+            }
+          },
+        ),
+      ],
     );
   }
 }

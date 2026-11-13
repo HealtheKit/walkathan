@@ -4,6 +4,9 @@ import 'package:go_router/go_router.dart';
 import '../../../config/router/route_names.dart';
 import '../../../models/custom_error.dart';
 import '../../../utils/error_dialog.dart';
+import '../../../theme/app_spacing.dart';
+import '../../../utils/app_snackbar.dart';
+import '../../widgets/auth_layout.dart';
 import '../../widgets/buttons.dart';
 import '../../widgets/form_fields.dart';
 
@@ -51,11 +54,7 @@ class _ResetPasswordPageState extends ConsumerState<ResetPasswordPage> {
             e as CustomError,
           ),
           data: (_) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Password reset email has been sent'),
-              ),
-            );
+            showAppSnackBar(context, 'Password reset email has been sent');
             GoRouter.of(context).goNamed(RouteNames.signin);
           },
         );
@@ -64,60 +63,37 @@ class _ResetPasswordPageState extends ConsumerState<ResetPasswordPage> {
 
     final resetPwdState = ref.watch(resetPasswordProvider);
 
-    return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
-      child: Scaffold(
-        body: Center(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 30),
-            child: Form(
-              key: _formKey,
-              autovalidateMode: _autovalidateMode,
-              child: ListView(
-                shrinkWrap: true,
-                reverse: true,
-                children: [
-                  Image.asset('assets/images/logo.png', width: 200, height: 200,),
-                  const SizedBox(height: 20.0),
-                  EmailFormField(emailController: _emailController),
-                  const SizedBox(height: 20.0),
-                  CustomFilledButton(
-                    onPressed: resetPwdState.maybeWhen(
-                      loading: () => null,
-                      orElse: () => _submit,
-                    ),
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600,
-                    child: Text(
-                      resetPwdState.maybeWhen(
-                        loading: () => 'Submitting...',
-                        orElse: () => 'Reset Password',
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text('Remember password? '),
-                      CustomTextButton(
-                        onPressed: resetPwdState.maybeWhen(
-                          loading: () => null,
-                          orElse: () =>
-                              () => context.goNamed(RouteNames.signin),
-                        ),
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        child: const Text('Sign In'),
-                      ),
-                    ],
-                  ),
-                ].reversed.toList(),
+    return AuthLayout(
+      title: 'Reset your password',
+      subtitle: "Enter your email and we'll send you a reset link.",
+      children: [
+        Form(
+          key: _formKey,
+          autovalidateMode: _autovalidateMode,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              EmailFormField(emailController: _emailController),
+              const SizedBox(height: AppSpacing.xl),
+              AppButton(
+                label: 'Send reset link',
+                loading: resetPwdState.isLoading,
+                onPressed: _submit,
               ),
-            ),
+            ],
           ),
         ),
-      ),
+        const SizedBox(height: AppSpacing.xl),
+        AuthFooter(
+          prompt: 'Remember your password?',
+          action: AppTextButton(
+            label: 'Sign in',
+            onPressed: resetPwdState.isLoading
+                ? null
+                : () => context.goNamed(RouteNames.signin),
+          ),
+        ),
+      ],
     );
   }
 }

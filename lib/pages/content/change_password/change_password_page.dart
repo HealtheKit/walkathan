@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../models/custom_error.dart';
 import '../../../repositories/auth_repository_provider.dart';
 import '../../../utils/error_dialog.dart';
+import '../../../theme/app_spacing.dart';
+import '../../widgets/auth_layout.dart';
 import '../../widgets/buttons.dart';
 import '../../widgets/form_fields.dart';
 import '../reauthenticate/reauthenticate_page.dart';
@@ -50,7 +52,8 @@ class _ChangePasswordPageState extends ConsumerState<ChangePasswordPage> {
   }
 
   void processRequiresRecentLogin() async {
-    final scaffoldMessenger = ScaffoldMessenger.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final theme = Theme.of(context);
 
     final result = await Navigator.of(context).push(
       MaterialPageRoute(
@@ -62,11 +65,22 @@ class _ChangePasswordPageState extends ConsumerState<ChangePasswordPage> {
     );
 
     if (result == 'success') {
-      scaffoldMessenger.showSnackBar(
-        const SnackBar(
-          content: Text('Successfully reauthenticated'),
-        ),
-      );
+      // Context may be unmounted after the await; use the captured
+      // messenger/theme with the shared snackbar styling.
+      messenger
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                Icon(Icons.check_circle_outline,
+                    size: 20, color: theme.colorScheme.onInverseSurface),
+                const SizedBox(width: 12),
+                const Expanded(child: Text('Successfully reauthenticated')),
+              ],
+            ),
+          ),
+        );
     }
   }
 
@@ -91,83 +105,37 @@ class _ChangePasswordPageState extends ConsumerState<ChangePasswordPage> {
 
     final chgPwdState = ref.watch(changePasswordProvider);
 
-    return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Change Password'),
-        ),
-        body: Center(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 30.0),
-            child: Form(
-              key: _formKey,
-              autovalidateMode: _autovalidateMode,
-              child: ListView(
-                shrinkWrap: true,
-                reverse: true,
-                children: [
-                  const Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text(
-                        'If you change password,',
-                        style: TextStyle(fontSize: 18),
-                      ),
-                      Text.rich(
-                        TextSpan(
-                          text: 'you will be ',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 18,
-                          ),
-                          children: [
-                            TextSpan(
-                              text: 'signed out!',
-                              style: TextStyle(
-                                color: Colors.red,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 40.0),
-                  PasswordFormField(
-                    passwordController: _passwordController,
-                    labelText: 'New password',
-                  ),
-                  const SizedBox(height: 20.0),
-                  ConfirmPasswordFormField(
-                    passwordController: _passwordController,
-                    labelText: 'Confirm new password',
-                  ),
-                  const SizedBox(height: 20.0),
-                  CustomFilledButton(
-                    onPressed: chgPwdState.maybeWhen(
-                      loading: () => null,
-                      orElse: () => _submit,
-                    ),
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.w600,
-                    child: Text(
-                      chgPwdState.maybeWhen(
-                        loading: () => 'Submitting...',
-                        orElse: () => 'Change Password',
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 10.0),
-                ].reversed.toList(),
+    return AuthLayout(
+      appBar: AppBar(title: const Text('Change Password')),
+      title: 'Choose a new password',
+      subtitle: 'For security, you will be signed out once it changes.',
+      showLogo: false,
+      children: [
+        Form(
+          key: _formKey,
+          autovalidateMode: _autovalidateMode,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              PasswordFormField(
+                passwordController: _passwordController,
+                labelText: 'New password',
               ),
-            ),
+              const SizedBox(height: AppSpacing.lg),
+              ConfirmPasswordFormField(
+                passwordController: _passwordController,
+                labelText: 'Confirm new password',
+              ),
+              const SizedBox(height: AppSpacing.xl),
+              AppButton(
+                label: 'Change Password',
+                loading: chgPwdState.isLoading,
+                onPressed: _submit,
+              ),
+            ],
           ),
         ),
-      ),
+      ],
     );
   }
 }
