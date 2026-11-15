@@ -1,11 +1,28 @@
 import 'package:flutter/material.dart';
 
+/// Selectable colour themes.
+enum AppPalette {
+  /// From the TEF Kuwait logo: cobalt, vermilion, gold. The default.
+  tef('TEF classic', 'Cobalt, gold and vermilion from the TEF logo'),
+
+  /// Kuwait: flag green, Gulf turquoise, desert gold on warm sand.
+  kuwait('Kuwait', 'Flag green, Gulf turquoise and desert gold');
+
+  const AppPalette(this.label, this.description);
+  final String label;
+  final String description;
+
+  static AppPalette parse(String? v) =>
+      AppPalette.values.firstWhere((p) => p.name == v, orElse: () => AppPalette.tef);
+}
+
 /// Brand palette derived from the TEF Kuwait logo: cobalt, vermilion, gold.
 abstract final class AppColors {
   static const Color cobalt = Color(0xFF0B57A8);
   static const Color vermilion = Color(0xFFC93F27);
 
-  static ColorScheme scheme(Brightness brightness) {
+  static ColorScheme scheme(Brightness brightness, [AppPalette palette = AppPalette.tef]) {
+    if (palette == AppPalette.kuwait) return _kuwait(brightness);
     final base = ColorScheme.fromSeed(
       seedColor: cobalt,
       brightness: brightness,
@@ -47,6 +64,62 @@ abstract final class AppColors {
   }
 }
 
+/// Kuwait: flag green leads; Gulf turquoise as the second voice; desert
+/// gold for highlights; warm sand surfaces (desert night in dark mode).
+/// Flag red is kept for errors only, so it never reads as decoration.
+ColorScheme _kuwait(Brightness brightness) {
+  const green = Color(0xFF007A3D);
+  const turquoise = Color(0xFF0F8B8D);
+  const red = Color(0xFFB5121B);
+  final base = ColorScheme.fromSeed(seedColor: green, brightness: brightness);
+  if (brightness == Brightness.light) {
+    return base.copyWith(
+      primary: green,
+      onPrimary: Colors.white,
+      primaryContainer: const Color(0xFFCDEBD8),
+      onPrimaryContainer: const Color(0xFF00391C),
+      secondary: turquoise,
+      onSecondary: Colors.white,
+      secondaryContainer: const Color(0xFFCFEDEC),
+      onSecondaryContainer: const Color(0xFF003B3C),
+      tertiary: const Color(0xFF8A6A0F),
+      error: red,
+      onError: Colors.white,
+      errorContainer: const Color(0xFFFFDAD6),
+      surface: const Color(0xFFF7F1E5),
+      onSurface: const Color(0xFF1E1A14),
+      onSurfaceVariant: const Color(0xFF5E5547),
+      surfaceContainerLowest: const Color(0xFFFFFDF8),
+      surfaceContainerLow: const Color(0xFFFFFBF2),
+      surfaceContainer: const Color(0xFFF1E8D6),
+      surfaceContainerHighest: const Color(0xFFE9DEC8),
+      outline: const Color(0xFF8F8270),
+      outlineVariant: const Color(0xFFE0D3BC),
+    );
+  }
+  return base.copyWith(
+    primary: const Color(0xFF6FD39A),
+    onPrimary: const Color(0xFF00391C),
+    primaryContainer: const Color(0xFF00532A),
+    onPrimaryContainer: const Color(0xFFCDEBD8),
+    secondary: const Color(0xFF6ED3D4),
+    onSecondary: const Color(0xFF003738),
+    secondaryContainer: const Color(0xFF004F50),
+    tertiary: const Color(0xFFE6C35A),
+    error: const Color(0xFFFF8A80),
+    onError: const Color(0xFF5C0006),
+    surface: const Color(0xFF14110D),
+    onSurface: const Color(0xFFEDE4D3),
+    onSurfaceVariant: const Color(0xFFB8AC97),
+    surfaceContainerLowest: const Color(0xFF0E0C09),
+    surfaceContainerLow: const Color(0xFF1B1712),
+    surfaceContainer: const Color(0xFF221D17),
+    surfaceContainerHighest: const Color(0xFF2E281F),
+    outline: const Color(0xFF7D725F),
+    outlineVariant: const Color(0xFF3A3328),
+  );
+}
+
 /// Semantic colors that Material's [ColorScheme] has no slot for.
 @immutable
 class BrandColors extends ThemeExtension<BrandColors> {
@@ -71,6 +144,24 @@ class BrandColors extends ThemeExtension<BrandColors> {
     silver: Color(0xFFB4B9C2),
     bronze: Color(0xFFC08457),
     success: Color(0xFF1E7B45),
+    onMedal: Color(0xFF1B1405),
+  );
+
+  /// Kuwait: desert gold; goal-met is Gulf turquoise so it stays distinct
+  /// from the green primary used for ordinary bars and progress.
+  static const kuwaitLight = BrandColors(
+    gold: Color(0xFFC9A227),
+    silver: Color(0xFFB4B9C2),
+    bronze: Color(0xFFB9784A),
+    success: Color(0xFF0B7779),
+    onMedal: Color(0xFF1B1405),
+  );
+
+  static const kuwaitDark = BrandColors(
+    gold: Color(0xFFE6C35A),
+    silver: Color(0xFF9AA1AD),
+    bronze: Color(0xFFD39A6E),
+    success: Color(0xFF6ED3D4),
     onMedal: Color(0xFF1B1405),
   );
 

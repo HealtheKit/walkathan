@@ -1,45 +1,74 @@
 import '../constants/firebase_constants.dart';
-import '../models/app_user.dart';
 import '../models/custom_error.dart';
+import '../models/walker_profile.dart';
 import 'handle_exception.dart';
 
+/// Household profiles (up to 6 per login). Privacy is enforced by RLS: a
+/// login can only ever see and change its own profiles.
 class ProfileRepository {
-  Future<AppUser> getProfile({required String uid}) async {
+  String get _accountId => supabaseClient.auth.currentUser!.id;
+
+  Future<List<WalkerProfile>> listProfiles() async {
     try {
-      final data = await supabaseClient
-          .from('users')
+      final rows = await supabaseClient
+          .from('profiles')
           .select()
-          .eq('id', uid)
-          .maybeSingle();
-
-      if (data != null) {
-        return AppUser.fromMap(data);
-      }
-
-      // Fallback: create the user row from auth metadata if it doesn't exist
-      final authUser = supabaseClient.auth.currentUser;
-      if (authUser != null && authUser.id == uid) {
-        final meta = authUser.userMetadata ?? {};
-        final row = {
-          'id': uid,
-          'name': meta['name'] ?? '',
-          'email': authUser.email ?? '',
-          'gender': meta['gender'] ?? 'male',
-        };
-
-        await supabaseClient.from('users').upsert(row);
-        return AppUser.fromMap(row);
-      }
-
-      throw const CustomError(
-        code: 'user-not-found',
-        message: 'Your profile could not be found. Please try signing out and signing back in.',
-        plugin: 'supabase_db',
-      );
-    } on CustomError {
-      rethrow;
+          .eq('account_id', _accountId)
+          .order('created_at');
+      return rows.map(WalkerProfile.fromMap).toList();
     } catch (e) {
       throw handleException(e);
     }
+  }
+
+  Future<WalkerProfile> addProfile({
+    required ProfileRelation relation,
+    required WalkerProfile details,
+  }) async {
+    assert(relation != ProfileRelation.self, 'self is created at signup');
+    try {
+      final row = await supabaseClient
+          .from('profiles')
+          .insert({
+            ...details.toWritableMap(),
+            'account_id': _accountId,
+            'relation': relation.name,
+          })
+          .select()
+          .single();
+      return WalkerProfile.fromMap(row);
+    } catch (e) {
+      throw _mapProfileError(e);
+    }
+  }
+
+  Future<void> updateProfile(WalkerProfile profile) async {
+    try {
+      await supabaseClient
+          .from('profiles')
+          .update(profile.toWritableMap())
+          .eq('id', profile.id);
+    } catch (e) {
+      throw handleException(e);
+    }
+  }
+
+  Future<void> deleteProfile(String profileId) async {
+    try {
+      await supabaseClient.from('profiles').delete().eq('id', profileId);
+    } catch (e) {
+      throw handleException(e);
+    }
+  }
+
+  CustomError _mapProfileError(Object e) {
+    if (e.toString().contains('profile limit reached')) {
+      return const CustomError(
+        code: 'profile-limit',
+        message: 'You can have at most 6 profiles on one account.',
+        plugin: 'supabase_db',
+      );
+    }
+    return handleException(e);
   }
 }

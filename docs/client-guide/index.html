@@ -1,0 +1,614 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TEF Walkathon — User and Administrator Guide</title>
+<meta name="description" content="How to use the Tresundios TEF Walkathon app: for participants, group owners and administrators.">
+<style>
+  :root {
+    --bg: #F7F7F5; --surface: #FFFFFF; --ink: #15181D; --muted: #555B66;
+    --line: #DADCE0; --primary: #0B57A8; --primary-soft: #E3ECF8;
+    --gold: #B5860F; --gold-soft: #FBF2DA; --ok: #1E7B45; --ok-soft: #E2F2E8;
+    --warn: #9A5B00; --warn-soft: #FFF1D6; --radius: 14px;
+    --shadow: 0 1px 2px rgba(16,24,40,.06), 0 4px 16px rgba(16,24,40,.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0E1116; --surface: #161B22; --ink: #E6E8EC; --muted: #A6ACB7;
+      --line: #2B323D; --primary: #8AB4F8; --primary-soft: #16263F;
+      --gold: #E6B84A; --gold-soft: #2C2412; --ok: #5CC98A; --ok-soft: #12291C;
+      --warn: #F0B35A; --warn-soft: #2E2210; --shadow: none;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 16px; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans", Arial, sans-serif;
+  }
+  a { color: var(--primary); }
+  ::selection { background: var(--primary-soft); }
+  .layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); max-width: 1280px; margin: 0 auto; }
+  nav.toc {
+    position: sticky; top: 0; align-self: start; height: 100vh; overflow: auto;
+    padding: 28px 20px 40px; border-right: 1px solid var(--line);
+  }
+  .brand { display: flex; gap: 10px; align-items: center; margin-bottom: 20px; }
+  .brand img { width: 44px; height: 44px; }
+  .brand b { display: block; font-size: 15px; line-height: 1.2; }
+  .brand span { font-size: 13px; color: var(--muted); }
+  nav.toc h4 { margin: 20px 0 6px; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  nav.toc a { display: block; padding: 5px 10px; border-radius: 8px; text-decoration: none; color: var(--ink); font-size: 14px; }
+  nav.toc a:hover, nav.toc a:focus-visible { background: var(--primary-soft); color: var(--primary); outline: none; }
+  main { padding: 40px 48px 96px; min-width: 0; }
+  header.hero { padding-bottom: 28px; border-bottom: 1px solid var(--line); margin-bottom: 8px; }
+  header.hero h1 { font-size: 40px; line-height: 1.1; letter-spacing: -.02em; margin: 0 0 12px; text-wrap: balance; }
+  header.hero p { font-size: 18px; color: var(--muted); max-width: 64ch; margin: 0; }
+  .meta { margin-top: 16px; font-size: 14px; color: var(--muted); }
+  section { padding-top: 44px; }
+  h2 { font-size: 28px; letter-spacing: -.01em; margin: 0 0 8px; text-wrap: balance; }
+  h3 { font-size: 20px; margin: 32px 0 6px; }
+  p, li { max-width: 72ch; }
+  .lead { color: var(--muted); font-size: 17px; margin-top: 0; }
+  .shot-row { display: flex; flex-wrap: wrap; gap: 28px; align-items: flex-start; margin: 18px 0 8px; }
+  .shot-row > .text { flex: 1 1 340px; min-width: 0; }
+  figure.phone { margin: 0; flex: 0 0 auto; width: 280px; }
+  figure.phone a { display: block; border: 1px solid var(--line); border-radius: 28px; padding: 8px; background: var(--surface); box-shadow: var(--shadow); }
+  figure.phone img { display: block; width: 100%; height: auto; border-radius: 20px; }
+  figure.phone.tall { max-height: 640px; overflow: hidden; }
+  figure.phone.tall a { max-height: 600px; overflow: hidden; position: relative; }
+  figure.phone.tall a::after {
+    content: "Tap to see the full screen"; position: absolute; left: 8px; right: 8px; bottom: 8px;
+    padding: 34px 0 12px; text-align: center; font-size: 13px; color: var(--ink);
+    background: linear-gradient(to bottom, transparent, var(--surface) 70%); border-radius: 0 0 20px 20px;
+  }
+  /* two screenshots: keep them side by side next to the text on wide screens */
+  .shot-row:has(> figure + figure) > figure.phone { width: 230px; }
+  @media (min-width: 1100px) { .shot-row { flex-wrap: nowrap; } }
+  .table-wrap { overflow-x: auto; max-width: 100%; }
+  figcaption { font-size: 13px; color: var(--muted); text-align: center; margin-top: 8px; }
+  .gallery { display: flex; flex-wrap: wrap; gap: 24px; margin: 18px 0; }
+  ol.steps { counter-reset: s; list-style: none; padding: 0; }
+  ol.steps > li { counter-increment: s; position: relative; padding-left: 40px; margin: 10px 0; }
+  ol.steps > li::before {
+    content: counter(s); position: absolute; left: 0; top: 1px; width: 26px; height: 26px; border-radius: 50%;
+    background: var(--primary); color: var(--bg); font-size: 13px; font-weight: 700;
+    display: grid; place-items: center;
+  }
+  .note { border-radius: var(--radius); padding: 14px 18px; margin: 16px 0; max-width: 72ch; }
+  .note b:first-child { display: block; margin-bottom: 2px; }
+  .note.tip { background: var(--ok-soft); }
+  .note.warn { background: var(--warn-soft); }
+  .note.info { background: var(--primary-soft); }
+  table { border-collapse: collapse; width: 100%; max-width: 900px; margin: 14px 0; font-size: 15px; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-size: 13px; color: var(--muted); font-weight: 600; }
+  td.num { font-variant-numeric: tabular-nums; }
+  code, kbd { font: 14px/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; background: var(--primary-soft); padding: 1px 6px; border-radius: 6px; }
+  pre { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; overflow-x: auto; max-width: 72ch; }
+  pre code { background: none; padding: 0; }
+  .pill { display: inline-block; font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 99px; background: var(--gold-soft); color: var(--gold); vertical-align: middle; }
+  details { border: 1px solid var(--line); border-radius: 10px; padding: 10px 16px; margin: 10px 0; max-width: 72ch; background: var(--surface); }
+  details summary { cursor: pointer; font-weight: 600; }
+  .menu-btn { display: none; }
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: minmax(0, 1fr); }
+    table { font-size: 14px; }
+    th, td { padding: 8px; }
+    .shot-row:has(> figure + figure) > figure.phone { width: calc(50% - 14px); }
+    nav.toc { position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--line); padding: 16px; }
+    nav.toc .links { display: none; }
+    nav.toc.open .links { display: block; }
+    .menu-btn { display: inline-block; margin-top: 8px; padding: 8px 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--ink); font: inherit; }
+    main { padding: 24px 16px 64px; }
+    header.hero h1 { font-size: 30px; }
+    figure.phone { width: min(280px, 100%); }
+  }
+  @media print {
+    nav.toc { display: none; }
+    .layout { display: block; }
+    main { padding: 0; }
+    section { break-inside: avoid-page; }
+    figure.phone.tall, figure.phone.tall a { max-height: none; }
+    figure.phone.tall a::after { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="toc" id="toc" aria-label="Contents">
+    <div class="brand">
+      <img src="images/logo.png" alt="">
+      <div><b>TEF Walkathon</b><span>User &amp; admin guide</span></div>
+    </div>
+    <button class="menu-btn" type="button" aria-expanded="false" aria-controls="toc-links"
+      onclick="const n=document.getElementById('toc');const o=n.classList.toggle('open');this.setAttribute('aria-expanded',o)">Contents</button>
+    <div class="links" id="toc-links">
+      <h4>Start here</h4>
+      <a href="#about">About the app</a>
+      <a href="#roles">Who can do what</a>
+      <h4>For participants</h4>
+      <a href="#first">First sign-in</a>
+      <a href="#family">Family profiles</a>
+      <a href="#new-phone">Getting a new phone</a>
+      <a href="#home">Home</a>
+      <a href="#walk">Walk: today's steps</a>
+      <a href="#counts">What counts as a step</a>
+      <a href="#activity">Activity, streaks and rest days</a>
+      <a href="#event">The event board</a>
+      <a href="#progress">My progress and badges</a>
+      <a href="#friends">Friends</a>
+      <a href="#groups">Groups and challenges</a>
+      <a href="#settings">Settings, privacy and themes</a>
+      <h4>For administrators</h4>
+      <a href="#admin-overview">Admin roles</a>
+      <a href="#members">Adding members</a>
+      <a href="#events">Creating an event</a>
+      <a href="#import">Importing participants</a>
+      <a href="#dashboard">Event dashboard</a>
+      <a href="#review">Reviewing step data</a>
+      <a href="#messages">Announcements and rewards</a>
+      <a href="#approvals">Approving changes and new phones</a>
+      <a href="#counts">Checking and resetting counts</a>
+      <a href="#event-organizers">Event organizers</a>
+      <a href="#staff">Staff roles</a>
+      <h4>Help</h4>
+      <a href="#troubleshooting">Troubleshooting</a>
+      <a href="#faq">Questions and answers</a>
+      <a href="#technical">Technical handover</a>
+    </div>
+  </nav>
+
+  <main>
+    <header class="hero">
+      <h1>TEF Walkathon: User and Administrator Guide</h1>
+      <p>How participants, group owners and walkathon administrators use the Tresundios TEF Walkathon app on Android and iPhone.</p>
+      <div class="meta">Version 1.0 · November 2026 · All screenshots show sample names and numbers.</div>
+    </header>
+
+    <!-- ================================================================ -->
+    <section id="about">
+      <h2>About the app</h2>
+      <p class="lead">The app counts each walker's steps from their own phone and ranks everyone in the walkathon events they are part of.</p>
+      <ul>
+        <li><b>Steps are counted automatically</b> from the phone and from Apple Health or Google Health Connect. Nobody can type steps in.</li>
+        <li><b>One login, the whole family.</b> A single email login can hold up to 6 walkers: the account holder, a spouse, children and one other person. Each walker has their own steps, on their own phone.</li>
+        <li><b>Events</b> are walkathons with a start and end date, created by the administrators. Only invited participants take part.</li>
+        <li><b>Leaderboards</b> rank walkers overall, and separately for men and women, by total steps, daily average, distance or active days.</li>
+        <li><b>Friends and groups</b> let people compete with colleagues, teams or neighbours, privately.</li>
+        <li><b>Privacy first.</b> Steps are private unless the walker is in an event, a group, or has accepted a friend.</li>
+      </ul>
+    </section>
+
+    <section id="roles">
+      <h2>Who can do what</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Role</th><th>Who</th><th>Can</th></tr></thead>
+        <tbody>
+          <tr><td><b>Participant</b></td><td>Everyone added by an administrator</td><td>Walk, see their progress and the event board, manage family profiles, friends and groups.</td></tr>
+          <tr><td><b>Group owner / admin</b></td><td>Anyone who creates a group, or is promoted in one</td><td>Invite people, set group challenges, Mystery Mode, remove members, export the group report.</td></tr>
+          <tr><td><b>Super Admin</b></td><td>The walkathon owner (set up once)</td><td>Everything below, plus adding members and assigning staff roles.</td></tr>
+          <tr><td><b>Organizer</b></td><td>Assigned by the Super Admin</td><td>Create and run events, import participants, announcements, rewards, reports.</td></tr>
+          <tr><td><b>Event organizer</b></td><td>Added to a specific event by the Super Admin (an event can have several)</td><td>Approve or reject "new phone" profile changes for members of their own events.</td></tr>
+          <tr><td><b>Verifier</b></td><td>Assigned by the Super Admin</td><td>Review step data, correct unusual days with a reason, ask a phone to re-send its steps.</td></tr>
+          <tr><td><b>Viewer</b></td><td>Assigned by the Super Admin</td><td>Read-only access to dashboards and reports.</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <!-- ================================================================ -->
+    <section id="first">
+      <h2>First sign-in</h2>
+      <p class="lead">There is no public sign-up. The walkathon administrator creates your login and gives you a temporary password.</p>
+      <div class="shot-row">
+        <div class="text">
+          <ol class="steps">
+            <li>Install the app from the link your administrator sends (Google Play internal test or Apple TestFlight).</li>
+            <li>Open it and sign in with your <b>email</b> and the <b>temporary password</b> you received.</li>
+            <li>Choose your own password (at least 6 characters) and type it twice.</li>
+            <li>Read <b>How your steps are shared</b>, tick <b>I understand and agree</b>, then tap <b>Continue</b>.</li>
+          </ol>
+          <div class="note warn"><b>New phone?</b>The first phone you sign in on is approved automatically, and so is any phone you have used before. A <b>new</b> phone shows <b>Waiting for approval</b> until a Super Admin or an organizer of your event approves it, then continues by itself. Until then it cannot count steps. A phone for another family member signing in with the same email is also a new phone. Super Admins can sign in from any phone without approval.</div>
+          <div class="note info"><b>Choose your profile.</b>Every time you sign in, the app lists your login's profiles and you pick who is walking on this phone (even if there is only one). Reopening the app without signing out does not ask again. Steps from the phone count for that profile.</div>
+          <div class="note info"><b>Forgot your password?</b>Tap <b>Forgot password?</b> on the sign-in screen to get a reset email, or ask your administrator for a new temporary password.</div>
+        </div>
+        <figure class="phone"><a href="images/signin.png" target="_blank"><img src="images/signin.png" alt="Sign-in screen with email and password fields" loading="lazy"></a><figcaption>Sign in</figcaption></figure>
+        <figure class="phone"><a href="images/welcome.png" target="_blank"><img src="images/welcome.png" alt="First sign-in: choose a password and accept the sharing notice" loading="lazy"></a><figcaption>First sign-in</figcaption></figure>
+      </div>
+    </section>
+
+    <section id="family">
+      <h2>Family profiles</h2>
+      <p class="lead">One login can hold up to 6 walkers. Each walker uses their own phone.</p>
+      <div class="shot-row">
+        <div class="text">
+          <ol class="steps">
+            <li>Open the account menu (top-right person icon) and choose <b>Profiles</b>.</li>
+            <li>Tap <b>Add a profile</b>, choose who it is (spouse, child or other), enter a name, the daily step goal and <b>sex</b>.</li>
+            <li>Sex is needed for the men's and women's boards. Height, weight and birth year are optional and only improve calorie estimates.</li>
+            <li>On each family member's own phone, sign in with the same email and tap the name chip at the top of the screen to choose who is walking on that phone.</li>
+          </ol>
+          <div class="note warn"><b>One phone belongs to one walker.</b>The first profile that walks with a phone owns it. Steps from that phone never count for anyone else, so family members cannot share or copy each other's steps. A mistaken choice can be changed within the first hour; otherwise a phone can move to another profile after 7 days without use.</div>
+        </div>
+        <figure class="phone"><a href="images/profiles.png" target="_blank"><img src="images/profiles.png" alt="Profiles list with Priya, Karthik and Anu" loading="lazy"></a><figcaption>Profiles</figcaption></figure>
+        <figure class="phone"><a href="images/profile_edit.png" target="_blank"><img src="images/profile_edit.png" alt="Edit profile form" loading="lazy"></a><figcaption>Edit a profile</figcaption></figure>
+      </div>
+    </section>
+
+    <section id="new-phone">
+      <h2>Getting a new phone</h2>
+      <p class="lead">Move your old profile's steps to the profile on your new phone. An organizer must approve it.</p>
+      <ol class="steps">
+        <li>Sign in on the new phone with the same email and make sure a profile exists for it (see Family profiles).</li>
+        <li>Open <b>Profiles</b> and tap <b>Got a new phone? Move a profile</b>.</li>
+        <li>Choose the profile on <b>this</b> phone (kept) and the <b>old</b> phone's profile (removed), then give a short reason.</li>
+        <li>Read the warning, tick the box and tap <b>Request approval</b>. You can cancel the request until it is decided.</li>
+        <li>When the Super Admin or an organizer of your event approves, the old profile's steps, rest days and missing details move into the new profile and the old profile is deleted. If it is rejected, nothing changes.</li>
+      </ol>
+      <div class="note warn"><b>This cannot be undone.</b>The old profile is permanently removed once approved. Its friends and group memberships are not carried over. Nothing happens before approval.</div>
+    </section>
+
+    <section id="home">
+      <h2>Home</h2>
+      <div class="shot-row">
+        <div class="text">
+          <p>Home answers three questions at a glance:</p>
+          <ul>
+            <li><b>How am I doing today?</b> Steps so far against your goal. Tap the card to open Walk.</li>
+            <li><b>Where do I stand?</b> Your current event, the day of the event, your rank and your total.</li>
+            <li><b>Is my streak alive?</b> Consecutive days you reached your goal. The flame grows while the streak lasts.</li>
+          </ul>
+          <p>The tabs at the bottom are <b>Home</b>, <b>Walk</b>, <b>Activity</b>, <b>Event</b> and <b>Social</b>. On tablets they appear down the left side.</p>
+        </div>
+        <figure class="phone"><a href="images/home.png" target="_blank"><img src="images/home.png" alt="Home screen: 5,230 steps today, event rank and streak" loading="lazy"></a><figcaption>Home</figcaption></figure>
+      </div>
+    </section>
+
+    <section id="walk">
+      <h2>Walk: today's steps</h2>
+      <div class="shot-row">
+        <div class="text">
+          <ol class="steps">
+            <li>The first time, tap <b>Allow</b> so the app can read steps. On Android it may ask you to install or open <b>Health Connect</b>; on iPhone, allow <b>Apple Health</b>.</li>
+            <li>Walk. The number goes up with every step while the app is open and a green <b>Live</b> marker shows (on iPhone it updates every couple of seconds). If the number drops slightly after a sync, steps from a cycling or machine session were removed. Your steps are uploaded about every 20 seconds while walking, and in the background on Android.</li>
+            <li>When you reach your goal, the ring completes and a short celebration plays.</li>
+          </ol>
+          <div class="note info"><b>Offline?</b>Steps are saved on the phone and uploaded automatically when you are back online. The screen says "Saved on this phone".</div>
+        </div>
+        <figure class="phone"><a href="images/walk.png" target="_blank"><img src="images/walk.png" alt="Walk screen with live step count" loading="lazy"></a><figcaption>Walking</figcaption></figure>
+        <figure class="phone"><a href="images/walk_goal.png" target="_blank"><img src="images/walk_goal.png" alt="Walk screen after the goal is reached" loading="lazy"></a><figcaption>Goal reached</figcaption></figure>
+      </div>
+    </section>
+
+    <section id="counts">
+      <h2>What counts as a step</h2>
+      <p class="lead">Only real walking and running on the move counts.</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Situation</th><th>Counted?</th></tr></thead>
+        <tbody>
+          <tr><td>Walking or running</td><td>Yes</td></tr>
+          <tr><td>Steps typed in by hand in a health app</td><td>No, never</td></tr>
+          <tr><td>Cycling, indoor or outdoor, and exercise bikes</td><td>No</td></tr>
+          <tr><td>Treadmill, elliptical, rowing and stair machines</td><td>No</td></tr>
+          <tr><td>Standing still</td><td>No (the phone's own step sensor ignores it)</td></tr>
+          <tr><td>More than 100,000 steps in a day, or faster than humanly possible</td><td>Rejected automatically</td></tr>
+        </tbody>
+      </table></div>
+      <div class="note warn"><b>Good to know</b>Exercise sessions are removed when your watch or fitness app records them as such. Steps are also ignored while your phone stays in one place, for example if it is shaken while you stand still, so allow location when asked. This only applies where the phone has a clear GPS signal; indoors or with a weak signal, steps count as usual. Organizers can cap or exclude an unusual day, and every change is recorded with a reason.</div>
+    </section>
+
+    <section id="activity">
+      <h2>Activity, streaks and rest days</h2>
+      <div class="shot-row">
+        <div class="text">
+          <ul>
+            <li>Switch between <b>Day</b>, <b>Week</b>, <b>Month</b> and <b>Year</b>; use the arrows to go back in time. Green bars reached the goal.</li>
+            <li>The <b>calendar</b> marks goal days, days with some steps and rest days. Tap any day for its details.</li>
+            <li><b>Streak</b>: consecutive goal days. A <b>rest day</b> keeps your streak alive without walking. Tap today or a future day and choose <b>Make this a rest day</b> (up to 2 per week).</li>
+            <li>Monthly and yearly <b>recaps</b>, <b>personal records</b> and <b>achievements</b> are further down.</li>
+          </ul>
+        </div>
+        <figure class="phone tall"><a href="images/activity.png" target="_blank"><img src="images/activity.png" alt="Activity screen: week chart, streak, calendar, recaps, records and achievements" loading="lazy"></a><figcaption>Activity</figcaption></figure>
+      </div>
+    </section>
+
+    <section id="event">
+      <h2>The event board</h2>
+      <div class="shot-row">
+        <div class="text">
+          <ul>
+            <li>The top shows the event name, the day of the event and how much of it has passed. If you are in several events, tap the name to switch.</li>
+            <li><b>Walkers, steps together</b> and <b>your rank</b>, then your standing: your percentile (for example "top 11%"), how far you are behind the next place, and how you compare with the event average.</li>
+            <li>Choose <b>Event</b>, <b>This week</b> or <b>Today</b>; <b>Everyone</b>, <b>Men</b> or <b>Women</b>; and rank by <b>Total steps</b>, <b>Daily average</b>, <b>Distance</b> or <b>Active days</b>.</li>
+            <li>Your other family profiles appear under <b>Your household</b> when they are further down the board.</li>
+            <li>Announcements from the organizers appear at the top.</li>
+          </ul>
+        </div>
+        <figure class="phone tall"><a href="images/event.png" target="_blank"><img src="images/event.png" alt="Event board with podium and rankings" loading="lazy"></a><figcaption>Event board</figcaption></figure>
+      </div>
+    </section>
+
+    <section id="progress">
+      <h2>My progress and badges</h2>
+      <div class="shot-row">
+        <div class="text">
+          <p>On the Event tab, tap <b>My progress, consistency and badges</b>.</p>
+          <div class="table-wrap"><table>
+            <tbody>
+              <tr><td><b>Event progress</b></td><td>Total steps, distance, days completed and remaining.</td></tr>
+              <tr><td><b>This week</b></td><td>Weekly total and average, best and lowest day, change against last week.</td></tr>
+              <tr><td><b>Trend</b></td><td>Daily bars with a gold line for your running total.</td></tr>
+              <tr><td><b>Step consistency</b></td><td>100 means the same steps every day; missed days lower it.</td></tr>
+              <tr><td><b>Timing consistency</b></td><td>How often you start walking within an hour of your usual time, whatever that time is.</td></tr>
+              <tr><td><b>Calendar</b></td><td>Target met, active, low, missed and upcoming days.</td></tr>
+              <tr><td><b>Back on track</b></td><td>Appears when you walk again after missed days.</td></tr>
+              <tr><td><b>Milestones and badges</b></td><td>First walk, 7-day streak, 100K steps, early bird, steady timing, finisher.</td></tr>
+              <tr><td><b>Recognition</b></td><td>Whether you currently qualify for the event's recognition.</td></tr>
+            </tbody>
+          </table></div>
+          <div class="note info"><b>Estimates</b>Active minutes and pace are estimated from steps and are labelled as estimates.</div>
+        </div>
+        <figure class="phone tall"><a href="images/progress.png" target="_blank"><img src="images/progress.png" alt="My progress page" loading="lazy"></a><figcaption>My progress</figcaption></figure>
+      </div>
+    </section>
+
+    <section id="friends">
+      <h2>Friends</h2>
+      <div class="shot-row">
+        <div class="text">
+          <ol class="steps">
+            <li>Open <b>Social → Friends</b>. Share <b>your code</b> (copy button) with a friend.</li>
+            <li>Type a friend's code and tap <b>Send request</b>. They must accept before either of you sees the other's steps.</li>
+            <li>Compare steps <b>Today</b>, <b>This week</b> or <b>This month</b>.</li>
+          </ol>
+          <p>From a friend's menu you can <b>Hide</b> them (they stay friends but leave your lists), <b>Remove</b> them, or <b>Block</b> them (the friendship ends and they cannot find you again; they are not told).</p>
+        </div>
+        <figure class="phone tall"><a href="images/friends.png" target="_blank"><img src="images/friends.png" alt="Friends screen with board, code and requests" loading="lazy"></a><figcaption>Friends</figcaption></figure>
+      </div>
+    </section>
+
+    <section id="groups">
+      <h2>Groups and challenges</h2>
+      <p class="lead">Groups are private step competitions for a team, family or class, from a few people up to 15,000.</p>
+      <div class="gallery">
+        <figure class="phone"><a href="images/groups.png" target="_blank"><img src="images/groups.png" alt="Groups list" loading="lazy"></a><figcaption>Your groups</figcaption></figure>
+        <figure class="phone"><a href="images/group_board.png" target="_blank"><img src="images/group_board.png" alt="Group board in Mystery Mode" loading="lazy"></a><figcaption>Group board (Mystery Mode)</figcaption></figure>
+        <figure class="phone tall"><a href="images/group_settings.png" target="_blank"><img src="images/group_settings.png" alt="Group settings" loading="lazy"></a><figcaption>Group settings</figcaption></figure>
+      </div>
+      <h3>Join or create</h3>
+      <ul>
+        <li><b>Create group</b>: give it a name. You become its owner.</li>
+        <li><b>Join with code</b>: enter the invite code you were given. Joining shares your name and step totals with the group.</li>
+      </ul>
+      <h3>For group owners and admins</h3>
+      <p>Tap the gear icon, or long-press the group name, to open <b>Group settings</b>:</p>
+      <ul>
+        <li><b>Invite people</b>: tap <b>New invite code</b>, then <b>Copy invitation</b> and paste it into a text or email. Codes last 14 days; <b>Revoke all</b> stops every code.</li>
+        <li><b>Mystery Mode</b>: today's step counts are hidden and only ranks show; counts are revealed the next day.</li>
+        <li><b>Fixed-date challenge</b>: add start and end dates (1 day to 1 year). Its board stays available after it ends until you clear it.</li>
+        <li><b>Report</b>: copy totals per member for any dates as a spreadsheet file. Use one group per team to compare teams.</li>
+        <li><b>Members</b>: make someone an admin, hand over ownership, or remove a member.</li>
+      </ul>
+    </section>
+
+    <section id="settings">
+      <h2>Settings, privacy and themes</h2>
+      <div class="shot-row">
+        <div class="text">
+          <p>Open the account menu and choose <b>Settings &amp; help</b>.</p>
+          <ul>
+            <li><b>Appearance</b>: choose <b>TEF classic</b> (blue and gold) or <b>Kuwait</b> (flag green, Gulf turquoise and desert gold). Dark mode follows the phone.</li>
+            <li><b>Privacy</b>: explains exactly who can see your steps. Each profile has a <b>Share steps with friends</b> switch.</li>
+            <li><b>Help &amp; Feedback</b>: answers to common questions, the support email, and a form to send feedback (it never includes your steps).</li>
+            <li><b>Delete account</b>: removes your login, every profile on it and all step history, permanently. You will be asked for your password.</li>
+          </ul>
+        </div>
+        <figure class="phone tall"><a href="images/settings.png" target="_blank"><img src="images/settings.png" alt="Settings screen" loading="lazy"></a><figcaption>Settings</figcaption></figure>
+      </div>
+      <div class="gallery">
+        <figure class="phone"><a href="images/theme_kuwait.png" target="_blank"><img src="images/theme_kuwait.png" alt="Home in the Kuwait theme" loading="lazy"></a><figcaption>Kuwait theme</figcaption></figure>
+        <figure class="phone tall"><a href="images/theme_dark.png" target="_blank"><img src="images/theme_dark.png" alt="Event board in the Kuwait theme, dark mode" loading="lazy"></a><figcaption>Kuwait theme, dark mode</figcaption></figure>
+      </div>
+    </section>
+
+    <!-- ================================================================ -->
+    <section id="admin-overview">
+      <h2>Administrator guide <span class="pill">Staff only</span></h2>
+      <p class="lead">Staff open the account menu and choose <b>Admin dashboard</b>. The Super Admin also sees <b>Members (admin)</b> and the staff-roles icon. Every permission is enforced on the server, not just hidden in the app.</p>
+      <div class="note tip"><b>Typical event, start to finish</b>
+        1. Create the event as a draft and set its rules. 2. Import the participant list. 3. Share sign-in details. 4. Set the event to <b>Live</b>. 5. Watch the dashboard daily. 6. At the end, export the report and record rewards.</div>
+    </section>
+
+    <section id="members">
+      <h2>Adding members</h2>
+      <div class="shot-row">
+        <div class="text">
+          <ol class="steps">
+            <li>Account menu → <b>Members (admin)</b> → <b>Add member</b>.</li>
+            <li>Enter the email and name. A <b>temporary password</b> is shown once. Copy it and send it to the person privately.</li>
+            <li>From a member's menu: <b>Reset password</b> (new temporary password), <b>Disable</b> or <b>Enable</b>, or <b>Delete</b> (permanent).</li>
+          </ol>
+          <div class="note info"><b>Adding many people?</b>Use the event import instead. It creates the logins and adds them to the event in one go.</div>
+        </div>
+        <figure class="phone"><a href="images/admin_members.png" target="_blank"><img src="images/admin_members.png" alt="Members list" loading="lazy"></a><figcaption>Members</figcaption></figure>
+      </div>
+    </section>
+
+    <section id="events">
+      <h2>Creating and running an event</h2>
+      <div class="gallery">
+        <figure class="phone"><a href="images/admin_events.png" target="_blank"><img src="images/admin_events.png" alt="Admin events list" loading="lazy"></a><figcaption>Events</figcaption></figure>
+        <figure class="phone"><a href="images/admin_event_detail.png" target="_blank"><img src="images/admin_event_detail.png" alt="Event detail with participants" loading="lazy"></a><figcaption>Event participants</figcaption></figure>
+        <figure class="phone tall"><a href="images/admin_event_settings.png" target="_blank"><img src="images/admin_event_settings.png" alt="Event settings" loading="lazy"></a><figcaption>Event settings</figcaption></figure>
+      </div>
+      <ol class="steps">
+        <li>Admin dashboard → <b>New event</b>: enter a name and choose the dates (up to one year). New events start as <b>Draft</b>, hidden from participants.</li>
+        <li>Open the event → <b>Settings</b>:
+          <ul>
+            <li><b>Daily target</b>: the goal used for "target met" days.</li>
+            <li><b>Daily cap</b> (optional): steps above this per day do not count.</li>
+            <li><b>Men's and women's boards</b>: on or off.</li>
+            <li><b>Recognition</b>: minimum total steps and/or minimum % of active days to qualify.</li>
+          </ul>
+        </li>
+        <li>Import participants (next section).</li>
+        <li>Set the status to <b>Live</b>. <b>Paused</b> keeps the event visible with a notice (steps are still saved); <b>Cancelled</b> ends it.</li>
+      </ol>
+      <p>In the participant list, each person's menu offers <b>Block</b> or <b>Reinstate</b>, <b>Move to another event</b>, and <b>Remove</b>.</p>
+    </section>
+
+    <section id="import">
+      <h2>Importing participants from a spreadsheet</h2>
+      <div class="shot-row">
+        <div class="text">
+          <ol class="steps">
+            <li>Prepare a list with one person per line: <code>email</code> or <code>email,name</code>. A header line is fine. Commas, semicolons and tabs all work.</li>
+            <li>Open the event → <b>Import CSV</b>. Copy the list from your spreadsheet, then tap <b>Paste</b>.</li>
+            <li>Tap <b>Check list</b>. It shows how many emails are valid, duplicates ignored, and which lines will be skipped.</li>
+            <li>Tap <b>Import</b>. Large lists import in batches with a progress bar.</li>
+            <li>New people get a login with a temporary password; people who already have a login are simply added. Tap <b>Copy all as CSV</b> to save the sign-in details.</li>
+          </ol>
+<pre><code>email,name
+arun.k@example.com,Arun
+meena.s@example.com,Meena
+fatima.a@example.com</code></pre>
+          <div class="note warn"><b>Passwords are shown only once.</b>They are not stored anywhere. Copy them before leaving the screen and share each one privately. If one is lost, use <b>Reset password</b> in Members. Importing the same list again is safe.</div>
+        </div>
+        <figure class="phone"><a href="images/admin_import.png" target="_blank"><img src="images/admin_import.png" alt="Import: list checked" loading="lazy"></a><figcaption>Checking the list</figcaption></figure>
+        <figure class="phone"><a href="images/admin_import_done.png" target="_blank"><img src="images/admin_import_done.png" alt="Import finished with temporary passwords" loading="lazy"></a><figcaption>Import finished</figcaption></figure>
+      </div>
+    </section>
+
+    <section id="dashboard">
+      <h2>Event dashboard</h2>
+      <div class="shot-row">
+        <div class="text">
+          <p>Open an event → <b>Dashboard</b>.</p>
+          <ul>
+            <li><b>Health</b>: participants, how many have walked, active today, total steps and distance, % synced in the last 48 hours, how many qualify for recognition, and the last leaderboard update.</li>
+            <li><b>Participation</b> donut and <b>daily participation</b> chart.</li>
+            <li><b>Highlights</b>: top walkers, most consistent, most improved over 7 days.</li>
+            <li><b>Needs attention</b>: filter by <b>No step data</b>, <b>Dropout risk</b>, <b>Not synced in 48 h</b>, <b>Unusually high day</b> or <b>Low consistency</b>. Tap a person to review them.</li>
+            <li>The table icon at the top copies a <b>full report</b> for spreadsheets: rank, name, email, sex, totals, active days, consistency, eligibility, reward and flags.</li>
+          </ul>
+        </div>
+        <figure class="phone tall"><a href="images/admin_dashboard.png" target="_blank"><img src="images/admin_dashboard.png" alt="Admin event dashboard" loading="lazy"></a><figcaption>Event dashboard</figcaption></figure>
+      </div>
+    </section>
+
+    <section id="review">
+      <h2>Reviewing step data</h2>
+      <div class="shot-row">
+        <div class="text">
+          <p>Each participant's page shows their totals and every day's steps, with where they came from (Health app or phone sensor).</p>
+          <ul>
+            <li><b>Correct a day</b> (verifiers): tap the pencil next to a day and choose <b>Exclude this day</b> or <b>Cap this day</b>. A reason is required and is kept in the audit trail. <b>Remove correction</b> undoes it.</li>
+            <li><b>Request re-sync</b> (verifiers): the person's phone uploads its last month again on its next sync.</li>
+            <li><b>Set sex</b>, <b>Set reward</b>, <b>Block from event</b> (organizers).</li>
+          </ul>
+          <div class="note info"><b>Participants can never change their own steps.</b>Corrections are only for staff, and every one is logged.</div>
+        </div>
+        <figure class="phone"><a href="images/admin_participant.png" target="_blank"><img src="images/admin_participant.png" alt="Participant review with a capped day" loading="lazy"></a><figcaption>Participant review</figcaption></figure>
+      </div>
+    </section>
+
+    <section id="messages">
+      <h2>Announcements and rewards</h2>
+      <ul>
+        <li><b>Announce</b> (event page): write a title and message and send it to <b>All</b>, <b>Men</b> or <b>Women</b>. It appears at the top of the participants' Event tab. Push notifications are not enabled.</li>
+        <li><b>Rewards</b>: on a participant's page, tap <b>Set reward</b>, enter the award (for example "Gold medal") and its status: <b>selected</b>, <b>awarded</b> or <b>delivered</b>. The participant sees it under Recognition.</li>
+        <li><b>Eligibility</b> is calculated from the event's recognition rules and shown on the dashboard and in the report.</li>
+      </ul>
+    </section>
+
+    <section id="approvals">
+      <h2>Approving profile changes and new phones</h2>
+      <ol class="steps">
+        <li>Super Admins and event organizers see <b>Approvals</b> in the account menu, with a count of waiting requests.</li>
+        <li>Each request shows the member's email, the old and new profile totals (steps and days), when the old phone last uploaded, and the member's reason.</li>
+        <li>Tap <b>Approve</b> to merge and delete the old profile, or <b>Reject</b> to leave everything as it is. Add a note if useful. Check that the reason is genuine, because approval is permanent.</li>
+        <li>The <b>New phones</b> tab lists phones waiting to be approved. It shows the member's email, the phone, and how many other approved phones they have. Approve only if you are sure it is their own phone. Reject lets them see your note and ask again.</li>
+        <li>You only see members of events you organize. You cannot approve your own request; another organizer or the Super Admin must. The History tab lists past decisions, and every decision is recorded.</li>
+      </ol>
+    </section>
+
+    <section id="counts">
+      <h2>Checking and resetting counts</h2>
+      <ul>
+        <li><b>Where a total comes from.</b> Open a participant. Each day lists every reading (Health app and phone sensor), the day total, and what actually counted after corrections, caps and resets. The Health app reading wins when both exist; they are never added together.</li>
+        <li><b>Verify all counts</b> (count-tools icon on the event dashboard, or the button on the event page). It recounts the event from the raw readings and checks that daily totals, weekly totals, the participant list and the leaderboard agree. Any mismatch is listed; <b>Repair totals</b> rebuilds the totals from the raw readings.</li>
+        <li><b>Set to zero.</b> Open the event and turn on the <b>Set all profiles to zero</b> switch to reset everyone in that event; turn it off to bring the counts back. To reset one person, open them from the dashboard and tap <b>Set to zero</b>. Super Admins and the event's organizers can do this. A reason is required and recorded. Steps walked before the reset stop counting, even if a phone uploads them later, and new steps count from that moment. <b>Undo reset</b> brings the counts back.</li>
+      </ul>
+      <div class="note warn"><b>A reset is a fresh start.</b>Each walker's own count for the day of the reset also restarts from zero on their phone the next time it syncs, so the Walk screen and the boards agree. Earlier days in their history are kept. Undoing the reset brings that day back.</div>
+    </section>
+
+    <section id="event-organizers">
+      <h2>Event organizers</h2>
+      <p>An event can have several organizers. The Super Admin opens an event, finds the <b>Organizers</b> card, taps <b>Add</b> and enters the person's login email (they must already be a member). Use the cross to remove one. Organizers only approve changes for members of the events they are added to. An organizer's login must have <b>only one profile</b>: a login with several family profiles can't be made an organizer, and an organizer can't add more profiles.</p>
+    </section>
+
+    <section id="staff">
+      <h2>Staff roles</h2>
+      <div class="shot-row">
+        <div class="text">
+          <ol class="steps">
+            <li>The Super Admin opens the Admin dashboard and taps the staff-roles icon at the top.</li>
+            <li>Enter the person's email (they must already be a member), choose <b>Organizer</b>, <b>Verifier</b> or <b>Viewer</b>, and tap <b>Grant role</b>.</li>
+            <li>Use the remove icon to take a role away.</li>
+          </ol>
+        </div>
+        <figure class="phone"><a href="images/admin_staff.png" target="_blank"><img src="images/admin_staff.png" alt="Staff roles" loading="lazy"></a><figcaption>Staff roles</figcaption></figure>
+      </div>
+    </section>
+
+    <!-- ================================================================ -->
+    <section id="troubleshooting">
+      <h2>Troubleshooting</h2>
+      <details><summary>My steps are not updating</summary>
+        <p>Open the app once; check the Walk screen for an <b>Allow</b> or <b>Health Connect</b> message; make sure you are online. If the screen says "Saved on this phone", it will upload automatically. Some phones' battery savers delay background updates; opening the app syncs immediately. If the number does not move while you walk, allow <b>Physical activity</b> (Android) or <b>Motion &amp; Fitness</b> (iPhone) for the app in your phone's settings. On Android, the total can also catch up late after you reopen the app, because Health Connect is updated by apps such as Google Fit or Samsung Health, sometimes 15 minutes or more behind.</p></details>
+      <details><summary>"This phone counts steps for someone else"</summary>
+        <p>Each phone belongs to one walker. Switch back to that person with the name chip, or, within an hour of first use, tap <b>Use this phone for … instead</b>. Otherwise the phone can switch after 7 days without use.</p></details>
+      <details><summary>I changed phones and my old steps are missing</summary>
+        <p>Use <b>Profiles &rarr; Got a new phone? Move a profile</b> and wait for an organizer to approve. Until then the old steps stay on the old profile.</p></details>
+      <details><summary>Some of my steps disappeared</summary>
+        <p>Steps recorded during cycling, treadmill or exercise-machine sessions are removed, and the Walk screen tells you how many. An organizer may also have capped an unusual day.</p></details>
+      <details><summary>I am not on the men's or women's board</summary>
+        <p>Add your sex in Profiles. You are always on the overall board.</p></details>
+      <details><summary>I cannot see the event</summary>
+        <p>Events appear once the organizers add you and set the event to Live. Ask them to check the participant list.</p></details>
+      <details><summary>A group invite code does not work</summary>
+        <p>Codes expire after 14 days and can be revoked or used up. Ask the group owner for a new code. After several wrong tries, wait 15 minutes.</p></details>
+      <details><summary>I forgot my password</summary>
+        <p>Use <b>Forgot password?</b> on the sign-in screen, or ask an administrator to reset it.</p></details>
+    </section>
+
+    <section id="faq">
+      <h2>Questions and answers</h2>
+      <details><summary>Does the app use GPS or my location?</summary><p>Yes, but only to check that you are really moving, so shaking the phone while standing still does not add steps. Location is processed on your phone, is never uploaded, and nobody can see where you walk. On Android a small "Counting your walk" notification shows while it runs. If you decline, the app still counts steps but cannot ignore shaking.</p></details>
+      <details><summary>Who can see my steps?</summary><p>Only you, unless you are in an event (other participants see your name and totals), a group you joined, or you accepted a friend and have sharing on.</p></details>
+      <details><summary>Is my health data used for advertising?</summary><p>No. Step and health data is never used for ads or shared with advertisers.</p></details>
+      <details><summary>Can my child have a profile?</summary><p>Yes, as one of the up to 6 profiles on your login. Please add a child only if you are their parent or guardian; their name and steps can appear on event boards.</p></details>
+      <details><summary>What happens when I delete my account?</summary><p>Your login, every profile on it and all step history are deleted permanently.</p></details>
+    </section>
+
+    <section id="technical">
+      <h2>Technical handover</h2>
+      <p class="lead">For the person who maintains the system.</p>
+      <div class="table-wrap"><table>
+        <tbody>
+          <tr><td><b>Backend</b></td><td>Supabase project <code>wyxfvskltoraontczdxf</code>. Database changes live in <code>supabase/migrations/</code> (apply in number order); <code>supabase/launch_all.sql</code> applies them all in one paste.</td></tr>
+          <tr><td><b>Health check</b></td><td>Paste <code>supabase/ops/health_check.sql</code> into the SQL Editor. Every row should say true; failing rows say how to fix them.</td></tr>
+          <tr><td><b>Server functions</b></td><td><code>admin-members</code> (add members, import) and <code>delete-account</code>. Deploy with <code>supabase functions deploy admin-members delete-account</code>.</td></tr>
+          <tr><td><b>First Super Admin</b></td><td>Create the user in Authentication → Users (tick Auto Confirm User), then run <code>select ops.seed_super_admin('email');</code>. Keep "Allow new users to sign up" switched off.</td></tr>
+          <tr><td><b>Database reset</b></td><td>See <code>docs/v2/03-database-reset-runbook.md</code>. It permanently deletes all accounts.</td></tr>
+          <tr><td><b>Still to configure before store release</b></td><td>The support email in <code>lib/config/app_config.dart</code> (placeholder), the iOS bundle id (<code>com.example.walkathan</code>), store listings, a privacy policy, and custom email (SMTP) if invitation emails are wanted.</td></tr>
+          <tr><td><b>Refreshing this guide's screenshots</b></td><td><code>flutter test tool/doc_screenshots/screenshots_test.dart --update-goldens</code></td></tr>
+        </tbody>
+      </table></div>
+    </section>
+  </main>
+</div>
+</body>
+</html>

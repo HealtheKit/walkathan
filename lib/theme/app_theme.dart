@@ -4,8 +4,8 @@ import 'app_colors.dart';
 import 'app_spacing.dart';
 
 abstract final class AppTheme {
-  static ThemeData light() => _build(Brightness.light);
-  static ThemeData dark() => _build(Brightness.dark);
+  static ThemeData light([AppPalette palette = AppPalette.tef]) => _build(Brightness.light, palette);
+  static ThemeData dark([AppPalette palette = AppPalette.tef]) => _build(Brightness.dark, palette);
 
   /// Large numerals (step counts, ranks) use tabular figures so digits
   /// don't shift width as values change.
@@ -13,8 +13,8 @@ abstract final class AppTheme {
     FontFeature.tabularFigures(),
   ];
 
-  static ThemeData _build(Brightness brightness) {
-    final scheme = AppColors.scheme(brightness);
+  static ThemeData _build(Brightness brightness, AppPalette palette) {
+    final scheme = AppColors.scheme(brightness, palette);
     final base = ThemeData(
       useMaterial3: true,
       brightness: brightness,
@@ -41,7 +41,12 @@ abstract final class AppTheme {
       scaffoldBackgroundColor: scheme.surface,
       visualDensity: VisualDensity.standard,
       extensions: [
-        brightness == Brightness.light ? BrandColors.light : BrandColors.dark,
+        switch ((palette, brightness)) {
+          (AppPalette.kuwait, Brightness.light) => BrandColors.kuwaitLight,
+          (AppPalette.kuwait, Brightness.dark) => BrandColors.kuwaitDark,
+          (_, Brightness.light) => BrandColors.light,
+          _ => BrandColors.dark,
+        },
       ],
       appBarTheme: AppBarTheme(
         backgroundColor: scheme.surface,

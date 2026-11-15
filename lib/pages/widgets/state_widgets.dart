@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/app_spacing.dart';
+import 'brand_animation.dart';
 import 'buttons.dart';
 
 /// Shared empty / error / loading states so every screen reports them the
@@ -14,8 +15,11 @@ class StateMessage extends StatelessWidget {
     this.actionLabel,
     this.onAction,
     this.tone,
+    this.animation,
   });
 
+  /// Replaces the icon with a brand animation.
+  final BrandAnimationKind? animation;
   final IconData icon;
   final String title;
   final String? message;
@@ -39,6 +43,9 @@ class StateMessage extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              if (animation != null)
+                BrandAnimation(animation!, size: 96)
+              else
               Container(
                 width: 64,
                 height: 64,
@@ -107,15 +114,17 @@ class EmptyState extends StatelessWidget {
     required this.title,
     this.message,
     this.icon = Icons.inbox_outlined,
+    this.animation,
   });
 
   final String title;
   final String? message;
   final IconData icon;
+  final BrandAnimationKind? animation;
 
   @override
   Widget build(BuildContext context) {
-    return StateMessage(icon: icon, title: title, message: message);
+    return StateMessage(icon: icon, title: title, message: message, animation: animation);
   }
 }
 

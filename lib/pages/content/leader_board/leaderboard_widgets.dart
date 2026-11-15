@@ -54,22 +54,30 @@ class LeaderboardTile extends StatelessWidget {
     required this.name,
     required this.steps,
     this.isCurrentUser = false,
+    this.valueText,
   });
 
   final int rank;
   final String name;
-  final int steps;
+
+  /// Replaces "N steps" when the board ranks by another metric.
+  final String? valueText;
+
+  /// Null = the count is hidden (Mystery Mode); only the rank shows.
+  final int? steps;
   final bool isCurrentUser;
 
   @override
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
     final scheme = Theme.of(context).colorScheme;
-    final formatted = NumberFormat.decimalPattern().format(steps);
+    final hidden = steps == null;
+    final formatted = hidden ? 'hidden' : NumberFormat.decimalPattern().format(steps);
 
     return Semantics(
       label:
-          'Rank $rank, $name${isCurrentUser ? ', you' : ''}, $formatted steps',
+          'Rank $rank, $name${isCurrentUser ? ', you' : ''}, '
+          '${hidden ? 'steps hidden until tomorrow' : valueText ?? '$formatted steps'}',
       excludeSemantics: true,
       child: Container(
         padding: const EdgeInsets.symmetric(
@@ -102,32 +110,37 @@ class LeaderboardTile extends StatelessWidget {
               ),
             ),
             const SizedBox(width: AppSpacing.md),
-            // Capped width: at large text scales the figure shrinks to fit
-            // instead of pushing the row past the card edge.
-            ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 120),
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
-                alignment: Alignment.centerRight,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      formatted,
-                      style: text.titleMedium?.copyWith(
-                        fontFeatures: AppTheme.tabularFigures,
+            if (hidden)
+              Icon(Icons.visibility_off_outlined,
+                  size: 20, color: scheme.onSurfaceVariant)
+            else
+              // Capped width: at large text scales the figure shrinks to fit
+              // instead of pushing the row past the card edge.
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 120),
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerRight,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        valueText ?? formatted,
+                        style: text.titleMedium?.copyWith(
+                          fontFeatures: AppTheme.tabularFigures,
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      'steps',
-                      style: text.bodySmall
-                          ?.copyWith(color: scheme.onSurfaceVariant),
-                    ),
-                  ],
+                      if (valueText == null) const SizedBox(width: 4),
+                      if (valueText == null)
+                      Text(
+                        'steps',
+                        style: text.bodySmall
+                            ?.copyWith(color: scheme.onSurfaceVariant),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
           ],
         ),
       ),

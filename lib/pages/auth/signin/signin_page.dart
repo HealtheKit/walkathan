@@ -97,14 +97,12 @@ class _SigninPageState extends ConsumerState<SigninPage> {
           ),
         ),
         const SizedBox(height: AppSpacing.xl),
-        AuthFooter(
-          prompt: 'Not a member?',
-          action: AppTextButton(
-            label: 'Sign up',
-            onPressed: signinState.isLoading
-                ? null
-                : () => context.goNamed(RouteNames.signup),
-          ),
+        Text(
+          'New here? Ask your walkathon administrator to add you.',
+          textAlign: TextAlign.center,
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
         ),
       ],
     );

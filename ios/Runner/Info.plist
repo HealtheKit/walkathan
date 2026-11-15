@@ -4,6 +4,20 @@
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>NSHealthShareUsageDescription</key>
+	<string>Tresundios reads your step count, distance, calories and floors from Apple Health to show your daily progress and walkathon ranking. It never changes your health data.</string>
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>Tresundios does not write to Apple Health.</string>
+	<key>NSMotionUsageDescription</key>
+	<string>Tresundios uses motion data to count your steps.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Tresundios uses your location only on this phone, to check that you are really moving so steps from shaking the phone are not counted. It is never uploaded.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Tresundios uses your location only on this phone, to check that you are really moving so steps from shaking the phone are not counted. It is never uploaded.</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>location</string>
+	</array>
 	<key>CFBundleDisplayName</key>
 	<string>Tresundios - TEF Walkathon</string>
 	<key>CFBundleExecutable</key>
